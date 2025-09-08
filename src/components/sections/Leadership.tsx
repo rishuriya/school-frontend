@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
-import { Leadership } from '../../types/school';
+import { Leadership as LeadershipType } from '../../types/school';
 
 interface LeadershipProps {
-  leaders: Leadership[];
+  leaders: LeadershipType[];
 }
 
 const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
@@ -109,7 +109,7 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold text-gray-900 mb-3">Message</h4>
                   <p className="text-gray-600 leading-relaxed italic">
-                    "{leader.message}"
+                    &ldquo;{leader.message}&rdquo;
                   </p>
                 </div>
 

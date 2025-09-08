@@ -95,7 +95,7 @@ export default function Contact() {
             Get in touch with us today
           </p>
           <p className="text-lg text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            We'd love to hear from you. Contact us to learn more about our school and how we can help your child succeed.
+            We&apos;d love to hear from you. Contact us to learn more about our school and how we can help your child succeed.
           </p>
         </div>
       </section>
@@ -108,7 +108,7 @@ export default function Contact() {
               Get in Touch
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              We're here to help and answer any questions you might have. We look forward to hearing from you.
+              We&apos;re here to help and answer any questions you might have. We look forward to hearing from you.
             </p>
           </div>
           
@@ -176,7 +176,7 @@ export default function Contact() {
                 Send us a Message
               </h2>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Have questions about our programs, admissions, or anything else? Fill out the form below and we'll get back to you as soon as possible.
+                Have questions about our programs, admissions, or anything else? Fill out the form below and we&apos;ll get back to you as soon as possible.
               </p>
               
               <Card variant="elevated" className="p-8">

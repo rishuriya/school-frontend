@@ -150,7 +150,7 @@ const Heroes: React.FC<HeroesProps> = ({ heroes }) => {
               Join Our Team of Heroes
             </h3>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Are you passionate about education and making a difference in students' lives? We're always looking for exceptional educators to join our team.
+              Are you passionate about education and making a difference in students&apos; lives? We&apos;re always looking for exceptional educators to join our team.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="gradient" size="lg">

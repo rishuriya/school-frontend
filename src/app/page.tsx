@@ -9,15 +9,7 @@ import Button from '../components/ui/Button';
 import Carousel from '../components/ui/Carousel';
 import Leadership from '../components/sections/Leadership';
 import Heroes from '../components/sections/Heroes';
-import { 
-  schoolApi, 
-  newsApi, 
-  eventsApi, 
-  heroesApi,
-  leadershipApi,
-  studentsApi, 
-  programsApi 
-} from '../services/api';
+// Removed unused API imports
 import { 
   carouselData,
   mockSchoolInfo,

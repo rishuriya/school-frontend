@@ -15,19 +15,14 @@ import {
 } from '../../types/school';
 
 export default function Events() {
-  const [schoolInfo, setSchoolInfo] = React.useState<SchoolInfo | null>(null);
+  // Removed unused schoolInfo state
   const [events, setEvents] = React.useState<Event[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const [school, eventsData] = await Promise.all([
-          schoolApi.getSchoolInfo(),
-          eventsApi.getUpcomingEvents()
-        ]);
-
-        setSchoolInfo(school);
+        const eventsData = await eventsApi.getUpcomingEvents();
         setEvents(eventsData);
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -98,7 +93,7 @@ export default function Events() {
               Upcoming Events
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Mark your calendar for these exciting events happening at our school. From academic competitions to cultural celebrations, there's something for everyone.
+              Mark your calendar for these exciting events happening at our school. From academic competitions to cultural celebrations, there&apos;s something for everyone.
             </p>
           </div>
           
@@ -175,7 +170,7 @@ export default function Events() {
               Browse Events by Category
             </h3>
             <p className="text-gray-600">
-              Filter events to find exactly what you're looking for
+              Filter events to find exactly what you&apos;re looking for
             </p>
           </div>
           

@@ -414,7 +414,7 @@ export default function Admissions() {
             Ready to Apply?
           </h2>
           <p className="text-xl mb-10 text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Start your child's educational journey with us. Our admissions team is here to guide you through every step of the process.
+            Start your child&apos;s educational journey with us. Our admissions team is here to guide you through every step of the process.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 shadow-xl">

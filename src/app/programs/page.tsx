@@ -15,7 +15,7 @@ import {
 } from '../../types/school';
 
 export default function Programs() {
-  const [schoolInfo, setSchoolInfo] = React.useState<SchoolInfo | null>(null);
+  // Removed unused schoolInfo state
   const [programs, setPrograms] = React.useState<Program[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -27,7 +27,6 @@ export default function Programs() {
           programsApi.getPrograms()
         ]);
 
-        setSchoolInfo(school);
         setPrograms(programsData);
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -305,7 +304,7 @@ export default function Programs() {
             Ready to Get Started?
           </h2>
           <p className="text-xl mb-10 text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Join our community of learners and discover the perfect program for your child's educational journey.
+            Join our community of learners and discover the perfect program for your child&apos;s educational journey.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 shadow-xl">
