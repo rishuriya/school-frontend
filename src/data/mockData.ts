@@ -4,7 +4,7 @@ import { SchoolInfo, NewsItem, Event, Faculty, Student, Program, ContactInfo, Le
 export const carouselData = [
   {
     id: "1",
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    image: "./carousel1.jpeg",
     title: "Welcome to Excellence",
     subtitle: "ज्ञानं परमं ध्येयम् - Where Learning Meets Innovation",
     description: "Discover a world of possibilities where every student is empowered to reach their full potential through cutting-edge CBSE education and personalized learning experiences while staying rooted in Indian values.",

@@ -1,22 +1,37 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { mockSchoolInfo } from "../data/mockData";
 
 export const metadata: Metadata = {
-  title: "Bright Future Academy - Empowering Minds, Building Futures",
-  description: "A premier educational institution committed to academic excellence, character development, and innovative learning. Join our community and discover your potential.",
-  keywords: "school, education, academy, learning, students, faculty, programs, events",
-  authors: [{ name: "Bright Future Academy" }],
+  title: `${mockSchoolInfo.name} - ${mockSchoolInfo.tagline}`,
+  description: mockSchoolInfo.description,
+  keywords: "school, education, academy, learning, students, faculty, programs, events, CBSE, Catholic school",
+  authors: [{ name: mockSchoolInfo.name }],
   robots: "index, follow",
+  icons: {
+    icon: mockSchoolInfo.logo,
+    shortcut: mockSchoolInfo.logo,
+    apple: mockSchoolInfo.logo,
+  },
   openGraph: {
-    title: "Bright Future Academy - Empowering Minds, Building Futures",
-    description: "A premier educational institution committed to academic excellence, character development, and innovative learning.",
+    title: `${mockSchoolInfo.name} - ${mockSchoolInfo.tagline}`,
+    description: mockSchoolInfo.description,
     type: "website",
     locale: "en_US",
+    images: [
+      {
+        url: mockSchoolInfo.logo || "/Kochas%20Logo.JPG",
+        width: 1200,
+        height: 630,
+        alt: `${mockSchoolInfo.name} Logo`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bright Future Academy - Empowering Minds, Building Futures",
-    description: "A premier educational institution committed to academic excellence, character development, and innovative learning.",
+    title: `${mockSchoolInfo.name} - ${mockSchoolInfo.tagline}`,
+    description: mockSchoolInfo.description,
+    images: [mockSchoolInfo.logo || "/Kochas%20Logo.JPG"],
   },
 };
 
