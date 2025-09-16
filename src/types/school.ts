@@ -8,6 +8,7 @@ export interface SchoolInfo {
   website: string;
   established: number;
   logo?: string;
+  city?: string;
 }
 
 export interface Leadership {

@@ -229,15 +229,16 @@ export const heroesData: Faculty[] = [
 ];
 
 export const mockSchoolInfo: SchoolInfo = {
-  name: "Bright Future Academy",
+  name: "St. Joseph's Catholic School",
   tagline: "Empowering Minds, Building Futures",
   description: "Bright Future Academy is a premier educational institution committed to academic excellence, character development, and innovative learning. We provide a nurturing environment where students can discover their potential and prepare for a successful future.",
   address: "123 Education Street, Knowledge City, KC 12345",
   phone: "+1 (555) 123-4567",
-  email: "info@brightfutureacademy.edu",
-  website: "www.brightfutureacademy.edu",
+  email: "info@stjosephscatholic.edu",
+  website: "www.stjosephscatholic.edu",
   established: 1995,
-  logo: "/school-logo.png"
+  city: "Kochas",
+  logo: "/Kochas%20Logo.JPG"
 };
 
 export const mockNews: NewsItem[] = [

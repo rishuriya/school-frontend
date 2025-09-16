@@ -18,6 +18,10 @@ interface CarouselProps {
   interval?: number;
   showIndicators?: boolean;
   showArrows?: boolean;
+  schoolName?: string;
+  city?: string;
+  schoolTagline?: string;
+  schoolLogo?: string;
 }
 
 const Carousel: React.FC<CarouselProps> = ({
@@ -26,6 +30,10 @@ const Carousel: React.FC<CarouselProps> = ({
   interval = 5000,
   showIndicators = true,
   showArrows = true,
+  schoolName,
+  city,
+  schoolTagline,
+  schoolLogo,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -72,14 +80,22 @@ const Carousel: React.FC<CarouselProps> = ({
               }}
             />
             
-            {/* Content Overlay */}
+            {/* Content Overlay */
+            }
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                  {item.title}
+                {schoolLogo && (
+                  <div className="mb-6 flex justify-center">
+                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-white/20 backdrop-blur-sm shadow-lg border-2 border-white/30">
+                      <img src={schoolLogo} alt="School logo" className="w-full h-full object-cover" />
+                    </div>
+                  </div>
+                )}
+                <h1 className="text-xl md:text-3xl lg:text-4xl font-extrabold mb-4 leading-tight drop-shadow-sm">
+                  {`${schoolName}, ${city}` || item.title}
                 </h1>
-                <h2 className="text-xl md:text-2xl lg:text-3xl mb-6 text-blue-200 font-medium">
-                  {item.subtitle}
+                <h2 className="text-md md:text-xl lg:text-2xl mb-6 text-blue-200 font-semibold">
+                  {schoolTagline || item.subtitle}
                 </h2>
                 <p className="text-lg md:text-xl mb-8 text-gray-200 max-w-2xl mx-auto leading-relaxed">
                   {item.description}
