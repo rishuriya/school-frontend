@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-
+import Image from 'next/image';
 interface CarouselItem {
   id: string;
   image: string;
@@ -87,7 +87,7 @@ const Carousel: React.FC<CarouselProps> = ({
                 {schoolLogo && (
                   <div className="mb-6 flex justify-center">
                     <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-white/20 backdrop-blur-sm shadow-lg border-2 border-white/30">
-                      <img src={schoolLogo} alt="School logo" className="w-full h-full object-cover" />
+                      <Image src={schoolLogo} alt="School logo" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 )}

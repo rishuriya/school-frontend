@@ -26,7 +26,7 @@ export interface Leadership {
 
 export interface AboutContent {
   id: string;
-  section: 'story' | 'mission' | 'vision' | 'values' | 'facilities' | 'contact';
+  section: 'story' | 'mission' | 'vision' | 'values' | 'facilities' | 'contact' | 'goals';
   title: string;
   subtitle?: string;
   content: string;
@@ -123,4 +123,48 @@ export interface Program {
   ageGroup?: string;
   classSize?: string;
   tuition?: string;
+}
+
+export interface House {
+  id: string;
+  name: string;
+  color: string;
+  description: string;
+  motto?: string;
+  captain?: string;
+  viceCaptain?: string;
+}
+
+export interface UniformSpecification {
+  id: string;
+  category: 'lkg-ukg' | 'primary-boys' | 'primary-girls' | 'middle-girls' | 'winter';
+  days: string;
+  description: string;
+  items: string[];
+  applicableClasses: string;
+  season?: 'regular' | 'winter' | 'house';
+}
+
+export interface LibraryRegulation {
+  id: string;
+  title: string;
+  description: string;
+  rules: string[];
+  fines?: {
+    lateReturn: string;
+    damage: string;
+  };
+}
+
+export interface AttendancePolicy {
+  id: string;
+  category: 'attendance' | 'punctuality' | 'leave' | 'withdrawal';
+  title: string;
+  description: string;
+  rules: string[];
+  penalties?: {
+    type: string;
+    amount?: string;
+    consequence: string;
+  }[];
 } 

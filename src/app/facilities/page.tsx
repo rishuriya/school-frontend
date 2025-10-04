@@ -5,7 +5,7 @@ import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
 import Card from '../../components/ui/Card';
 import { facilities } from '../../data/mockData';
-
+import Image from 'next/image';
 export default function FacilitiesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -17,7 +17,7 @@ export default function FacilitiesPage() {
             {facilities.map((f) => (
               <Card key={f.id} variant="elevated">
                 <div className="h-48 rounded-xl overflow-hidden mb-4">
-                  {f.image && <img src={f.image} alt={f.name} className="w-full h-full object-cover" />}
+                  {f.image && <Image src={f.image} alt={f.name} className="w-full h-full object-cover" />}
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-gray-900">{f.name}</h3>
                 <p className="text-gray-600 mb-4">{f.description}</p>

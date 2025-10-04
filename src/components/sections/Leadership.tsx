@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { Leadership as LeadershipType } from '../../types/school';
-
+import Image from 'next/image';
 interface LeadershipProps {
   leaders: LeadershipType[];
 }
@@ -86,8 +86,8 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
               {/* Leader Image */}
               <div className="relative mb-6">
                 <div className="w-full h-64 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl overflow-hidden">
-                  <img
-                    src={leader.image}
+                  <Image
+                    src={leader.image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'}
                     alt={leader.name}
                     className="w-full h-full object-cover"
                   />

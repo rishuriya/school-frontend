@@ -1,4 +1,4 @@
-import { SchoolInfo, NewsItem, Event, Faculty, Student, Program, ContactInfo, Leadership, AboutContent, CoreValue, Facility } from '../types/school';
+import { SchoolInfo, NewsItem, Event, Faculty, Student, Program, ContactInfo, Leadership, AboutContent, CoreValue, Facility, House, UniformSpecification, LibraryRegulation, AttendancePolicy } from '../types/school';
 
 // Carousel data for hero section
 export const carouselData = [
@@ -46,28 +46,37 @@ export const aboutContent: AboutContent[] = [
     id: "1",
     section: "story",
     title: "Our Story",
-    subtitle: "A Journey of Excellence in Indian Education",
-    content: "Founded in 1995, Vidya Bharati International School began with a simple yet powerful vision: to create an educational environment where every student could discover their potential while staying rooted in Indian values and culture. Over the years, we have grown from a small institution to a premier CBSE-affiliated educational establishment, serving thousands of students and families across India. Our commitment to academic excellence, character development, and innovative learning while preserving our rich Indian heritage has remained unwavering.",
+    subtitle: "A Catholic Educational Institute in Buxar Diocese",
+    content: "St. Joseph Catholic School is one of the Educational institutes of the Catholic Diocese of Buxar. This school is motivated by the teachings of Jesus Christ, promoting human values and excellence in each one. Love, joy, fellowship, hard work and sincerity are few of the prominent elements instilled in students during their formation in the school. The main aim of St. Joseph Catholic School is to develop the individual personality of each pupil and to elicit those qualities which are best and noblest in them.",
     image: "https://images.unsplash.com/photo-1523050854058-8df90110c9e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
     order: 1,
     isActive: true
   },
   {
     id: "2",
-    section: "mission",
-    title: "Our Mission",
-    subtitle: "Empowering Students for Success with Indian Values",
-    content: "To provide exceptional CBSE education that empowers students with knowledge, skills, and character needed to succeed in an ever-changing world while preserving Indian cultural values. We are committed to fostering academic excellence, personal growth, social responsibility, and national pride.",
+    section: "vision",
+    title: "Our Vision",
+    subtitle: "Formation of Human Person Committed to God and Country",
+    content: "Our Vision is the formation of human person committed to God and country. We aim to develop individuals who are rooted in Christian values while contributing meaningfully to the nation's progress and development.",
     order: 2,
     isActive: true
   },
   {
     id: "3",
-    section: "vision",
-    title: "Our Vision",
-    subtitle: "Shaping Future Leaders of India",
-    content: "To be the leading educational institution in India that inspires innovation, nurtures talent, and shapes future leaders who will make a positive impact on society while contributing to India's growth story. We envision a world where every student reaches their full potential while staying connected to their roots.",
+    section: "mission",
+    title: "Our Mission",
+    subtitle: "Forming Men and Women of Character, Competence, Conscience and Compassion",
+    content: "Our Mission is to form the young as men and women of character, competence, conscience and compassion, committed to build a just society. We strive to create individuals who embody Christian values and work towards building a more just and compassionate world.",
     order: 3,
+    isActive: true
+  },
+  {
+    id: "4",
+    section: "goals",
+    title: "Our Goals",
+    subtitle: "Building a Just Society Through Education",
+    content: "Our Goals include: Christian formation of our community members through faith education reflected in word and action; Creation of a society inspired by Gospel values of service in love and peace rooted in justice and fellowship based on equality; Provision for quality education that is relevant to all and in particular to the marginalized in the diocese of Buxar; An education that promotes intellectual excellence, religious tolerance, patriotism and uprightness of character.",
+    order: 4,
     isActive: true
   }
 ];
@@ -76,35 +85,75 @@ export const aboutContent: AboutContent[] = [
 export const coreValues: CoreValue[] = [
   {
     id: "1",
-    title: "Excellence (उत्कृष्टता)",
-    description: "We strive for excellence in everything we do, setting high standards for academic achievement and personal growth while maintaining the highest quality of education as per CBSE guidelines.",
-    icon: "check-circle",
-    color: "from-blue-500 to-purple-600",
+    title: "Love & Fellowship",
+    description: "We promote love, joy, fellowship, hard work and sincerity as prominent elements in student formation, following the teachings of Jesus Christ and fostering human values.",
+    icon: "heart",
+    color: "from-red-500 to-pink-600",
     order: 1
   },
   {
     id: "2",
-    title: "Integrity (ईमानदारी)",
-    description: "We uphold the highest standards of honesty, ethics, and moral character in all our interactions and decisions, following the principles of Dharma and righteous conduct.",
+    title: "Character & Discipline",
+    description: "We instill high standards of moral values and discipline, developing individual personality and eliciting the best and noblest qualities in each pupil through Christian formation.",
     icon: "users",
-    color: "from-green-500 to-teal-600",
+    color: "from-blue-500 to-indigo-600",
     order: 2
   },
   {
     id: "3",
-    title: "Compassion (करुणा)",
-    description: "We foster a caring and supportive environment where empathy, kindness, and understanding are valued and practiced, reflecting the Indian value of 'Vasudhaiva Kutumbakam' (World is one family).",
-    icon: "heart",
-    color: "from-purple-500 to-pink-600",
+    title: "Service & Justice",
+    description: "We form students as men and women of character, competence, conscience and compassion, committed to build a just society inspired by Gospel values of service in love and peace.",
+    icon: "hand-heart",
+    color: "from-green-500 to-teal-600",
     order: 3
   },
   {
     id: "4",
-    title: "Innovation (नवाचार)",
-    description: "We embrace creativity and innovation, encouraging students to think critically and solve problems in new ways while staying connected to Indian traditions and values.",
-    icon: "lightning-bolt",
+    title: "Excellence & Patriotism",
+    description: "We provide quality education that promotes intellectual excellence, religious tolerance, patriotism and uprightness of character, especially for the marginalized in our community.",
+    icon: "star",
     color: "from-yellow-500 to-orange-600",
     order: 4
+  }
+];
+
+// House System data
+export const houseSystem: House[] = [
+  {
+    id: "1",
+    name: "Mahatma Gandhi House",
+    color: "Red",
+    description: "Named after the Father of the Nation, Mahatma Gandhi House embodies the values of truth, non-violence, and service to humanity. Students in this house are encouraged to develop leadership qualities through peaceful means and social service.",
+    motto: "Truth and Non-violence",
+    captain: "To be announced",
+    viceCaptain: "To be announced"
+  },
+  {
+    id: "2",
+    name: "Mother Teresa House",
+    color: "Yellow",
+    description: "Inspired by Saint Mother Teresa's life of service to the poor and marginalized, this house focuses on compassion, charity, and selfless service. Students learn the importance of caring for others and making a difference in society.",
+    motto: "Service to Humanity",
+    captain: "To be announced",
+    viceCaptain: "To be announced"
+  },
+  {
+    id: "3",
+    name: "Abdul Kalam House",
+    color: "Green",
+    description: "Named after Dr. A.P.J. Abdul Kalam, the People's President, this house emphasizes scientific thinking, innovation, and dedication to learning. Students are encouraged to pursue excellence in academics and contribute to nation-building.",
+    motto: "Dream, Believe, Achieve",
+    captain: "To be announced",
+    viceCaptain: "To be announced"
+  },
+  {
+    id: "4",
+    name: "Savithri Phule House",
+    color: "Blue",
+    description: "Named after Savitribai Phule, the pioneer of women's education in India, this house promotes gender equality, education for all, and social reform. Students learn about the importance of education in transforming society.",
+    motto: "Education for All",
+    captain: "To be announced",
+    viceCaptain: "To be announced"
   }
 ];
 
@@ -229,14 +278,14 @@ export const heroesData: Faculty[] = [
 ];
 
 export const mockSchoolInfo: SchoolInfo = {
-  name: "St. Joseph's Catholic School",
-  tagline: "Empowering Minds, Building Futures",
-  description: "Bright Future Academy is a premier educational institution committed to academic excellence, character development, and innovative learning. We provide a nurturing environment where students can discover their potential and prepare for a successful future.",
-  address: "123 Education Street, Knowledge City, KC 12345",
-  phone: "+1 (555) 123-4567",
-  email: "info@stjosephscatholic.edu",
-  website: "www.stjosephscatholic.edu",
-  established: 1995,
+  name: "St. Joseph Catholic School",
+  tagline: "Let your light shine",
+  description: "St. Joseph Catholic School is one of the Educational institutes of the Catholic Diocese of Buxar. This school is motivated by the teachings of Jesus Christ, promoting human values and excellence in each one. Love, joy, fellowship, hard work and sincerity are few of the prominent elements instilled in students during their formation in the school.",
+  address: "Kochas, Rohtas, Bihar",
+  phone: "+91 120 4567890",
+  email: "info@stjosephcatholic.edu",
+  website: "www.stjosephcatholic.edu",
+  established: 2015,
   city: "Kochas",
   logo: "/Kochas%20Logo.JPG"
 };
@@ -447,12 +496,12 @@ export const mockPrograms: Program[] = [
   {
     id: "1",
     name: "Pre-Nursery (Play Group)",
-    description: "Early childhood education program for children ages 2-3, focusing on foundational learning, social skills, and creative development through play-based activities in a nurturing Indian environment.",
+    description: "Early childhood education program for children ages 2-3, focusing on foundational learning, social skills, and creative development through play-based activities in a nurturing Catholic environment that promotes Christian values.",
     duration: "1 Year",
     category: "elementary",
-    requirements: ["Age 2-3", "Basic health checkup", "Parent interview"],
+    requirements: ["Age 2-3", "Basic health checkup", "Parent interview", "Baptism certificate (if applicable)"],
     image: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    features: ["Play-based learning", "Social skills development", "Creative arts", "Physical activities", "Indian cultural values"],
+    features: ["Play-based learning", "Christian values formation", "Social skills development", "Creative arts", "Prayer and reflection time"],
     ageGroup: "2-3 years",
     classSize: "15 students max",
     tuition: "₹1,20,000/year"
@@ -460,12 +509,12 @@ export const mockPrograms: Program[] = [
   {
     id: "2",
     name: "Nursery",
-    description: "Foundation year preparing children for formal education with focus on reading readiness, basic math concepts, and social development while introducing Indian cultural elements.",
+    description: "Foundation year preparing children for formal education with focus on reading readiness, basic math concepts, and social development while introducing Christian values and moral formation.",
     duration: "1 Year",
     category: "elementary",
-    requirements: ["Age 3-4", "Basic health checkup", "Parent interview"],
+    requirements: ["Age 3-4", "Basic health checkup", "Parent interview", "Character reference"],
     image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2022&q=80",
-    features: ["Reading readiness", "Basic math", "Social skills", "Creative expression", "Hindi alphabet introduction"],
+    features: ["Reading readiness", "Basic math", "Christian values", "Creative expression", "Prayer time", "Moral formation"],
     ageGroup: "3-4 years",
     classSize: "18 students max",
     tuition: "₹1,50,000/year"
@@ -473,12 +522,12 @@ export const mockPrograms: Program[] = [
   {
     id: "3",
     name: "Primary School (Classes 1-5)",
-    description: "Comprehensive primary education following CBSE curriculum, focusing on core academic subjects, character development, and exploration of various learning areas with Indian cultural integration.",
+    description: "Comprehensive primary education following CBSE curriculum, focusing on core academic subjects, character development, and Christian formation with emphasis on moral values and discipline.",
     duration: "5 Years",
     category: "elementary",
-    requirements: ["Age 5-10", "Previous school records", "Assessment test"],
+    requirements: ["Age 5-10", "Previous school records", "Assessment test", "Character reference", "Parent commitment to school values"],
     image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
-    features: ["CBSE curriculum", "Hindi & English", "Art & Music", "Physical Education", "Indian cultural studies"],
+    features: ["CBSE curriculum", "Christian values formation", "Moral education", "Prayer and reflection", "Character development", "House system participation"],
     ageGroup: "5-10 years",
     classSize: "25 students max",
     tuition: "₹2,00,000/year"
@@ -486,12 +535,12 @@ export const mockPrograms: Program[] = [
   {
     id: "4",
     name: "Middle School (Classes 6-8)",
-    description: "Transitional program preparing students for secondary education with advanced academics, leadership opportunities, and specialized subjects as per CBSE guidelines.",
+    description: "Transitional program preparing students for secondary education with advanced academics, leadership opportunities, and Christian formation focusing on character, competence, conscience and compassion.",
     duration: "3 Years",
     category: "middle",
-    requirements: ["Age 11-13", "Primary completion", "Academic assessment"],
+    requirements: ["Age 11-13", "Primary completion", "Academic assessment", "Character evaluation", "Parent interview"],
     image: "https://images.unsplash.com/photo-1523050854058-8df90110c9e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    features: ["Advanced academics", "Leadership development", "Science & Mathematics", "Sports programs", "Computer education"],
+    features: ["Advanced academics", "Christian leadership", "Moral formation", "Science & Mathematics", "Service learning", "House leadership opportunities"],
     ageGroup: "11-13 years",
     classSize: "30 students max",
     tuition: "₹2,50,000/year"
@@ -499,12 +548,12 @@ export const mockPrograms: Program[] = [
   {
     id: "5",
     name: "Secondary School (Classes 9-10)",
-    description: "CBSE Class 9-10 education offering comprehensive academic preparation, career exploration, and board exam preparation with focus on Indian educational standards.",
+    description: "CBSE Class 9-10 education offering comprehensive academic preparation, career exploration, and board exam preparation with strong emphasis on Christian values and moral formation.",
     duration: "2 Years",
     category: "high",
-    requirements: ["Age 14-15", "Middle school completion", "Academic records", "Interview"],
+    requirements: ["Age 14-15", "Middle school completion", "Academic records", "Character assessment", "Parent commitment interview"],
     image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    features: ["CBSE Class 10 preparation", "Board exam coaching", "Career counseling", "Extracurricular activities", "Competitive exam preparation"],
+    features: ["CBSE Class 10 preparation", "Christian leadership", "Service learning", "Career counseling", "Moral formation", "Student council participation"],
     ageGroup: "14-15 years",
     classSize: "35 students max",
     tuition: "₹3,00,000/year"
@@ -512,12 +561,12 @@ export const mockPrograms: Program[] = [
   {
     id: "6",
     name: "Senior Secondary (Classes 11-12)",
-    description: "CBSE Class 11-12 education with Science, Commerce, and Humanities streams, offering comprehensive preparation for competitive exams and higher education in India.",
+    description: "CBSE Class 11-12 education with Science, Commerce, and Humanities streams, offering comprehensive preparation for competitive exams and higher education while forming students as men and women of character, competence, conscience and compassion.",
     duration: "2 Years",
     category: "specialized",
-    requirements: ["Class 10 completion", "Strong academic background", "Stream selection", "Application essay"],
+    requirements: ["Class 10 completion", "Strong academic background", "Character evaluation", "Stream selection", "Service commitment"],
     image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    features: ["CBSE Class 12 preparation", "JEE/NEET coaching", "Commerce/Humanities streams", "University preparation", "Academic excellence"],
+    features: ["CBSE Class 12 preparation", "JEE/NEET coaching", "Commerce/Humanities streams", "Christian leadership", "Service to community", "Moral excellence"],
     ageGroup: "16-17 years",
     classSize: "30 students max",
     tuition: "₹3,50,000/year"
@@ -525,14 +574,406 @@ export const mockPrograms: Program[] = [
 ];
 
 export const mockContactInfo: ContactInfo = {
-  address: "123 Education Street, Knowledge City, Buxar 12345",
+  address: "Catholic Diocese of Buxar, Buxar, Bihar",
   phone: "+91 120 4567890",
-  email: "info@brightfutureacademy.edu",
-  website: "www.brightfutureacademy.edu",
+  email: "info@stjosephcatholic.edu",
+  website: "www.stjosephcatholic.edu",
   socialMedia: {
-    facebook: "https://facebook.com/brightfutureacademy",
-    twitter: "https://twitter.com/bfacademy",
-    instagram: "https://instagram.com/brightfutureacademy",
-    linkedin: "https://linkedin.com/company/brightfutureacademy"
+    facebook: "https://facebook.com/stjosephcatholicschool",
+    twitter: "https://twitter.com/stjosephcatholic",
+    instagram: "https://instagram.com/stjosephcatholic",
+    linkedin: "https://linkedin.com/company/stjosephcatholicschool"
   }
-}; 
+};
+
+// School Uniform Specifications
+export const uniformSpecifications: UniformSpecification[] = [
+  {
+    id: "1",
+    category: "lkg-ukg",
+    days: "Monday, Tuesday, Thursday and Friday",
+    description: "Regular uniform for LKG & UKG students",
+    applicableClasses: "LKG & UKG",
+    season: "regular",
+    items: [
+      "Boys: Parrot Green Colour T.Shirt with school monogram and Dark Navy-Blue colour full pants",
+      "Black shoes, Parrot Green colour socks with Carbon blue colour double rings atop",
+      "School Belt",
+      "Girls: Parrot Green Colour T.Shirt with school monogram and Dark Navy-Blue Skirts",
+      "Black shoes, Parrot Green colour socks with Carbon blue colour double rings atop",
+      "School Belt"
+    ]
+  },
+  {
+    id: "2",
+    category: "lkg-ukg",
+    days: "Wednesday and Saturday",
+    description: "House uniform for LKG & UKG students",
+    applicableClasses: "LKG & UKG",
+    season: "house",
+    items: [
+      "House T.Shirt with school monogram and black colour long trousers with strips of all the colours of the houses",
+      "White colour shoes, white colour socks with Carbon blue colour double rings atop"
+    ]
+  },
+  {
+    id: "3",
+    category: "primary-boys",
+    days: "Monday, Tuesday, Thursday and Friday",
+    description: "Regular uniform for Classes I to X Boys",
+    applicableClasses: "Classes I to X (Boys)",
+    season: "regular",
+    items: [
+      "Maroon colour shirt with Navy Blue colour Check with school monogram",
+      "Dark Navy Blue colour full pants",
+      "Black colour shoes, Navy Blue colour socks with Maroon colour double rings atop",
+      "School Belt and Tie"
+    ]
+  },
+  {
+    id: "4",
+    category: "primary-girls",
+    days: "Monday, Tuesday, Thursday and Friday",
+    description: "Regular uniform for Classes I to V Girls",
+    applicableClasses: "Classes I to V (Girls)",
+    season: "regular",
+    items: [
+      "Maroon colour shirt with Navy Blue colour Check with school monogram",
+      "Dark Navy-Blue colour Skirts",
+      "Black colour shoes, Navy Blue colour socks with Maroon colour double rings atop",
+      "School Belt and Tie"
+    ]
+  },
+  {
+    id: "5",
+    category: "middle-girls",
+    days: "Monday, Tuesday, Thursday and Friday",
+    description: "Regular uniform for Classes VI to X Girls",
+    applicableClasses: "Classes VI to X (Girls)",
+    season: "regular",
+    items: [
+      "Salwar Suit (Maroon colour with Navy Blue colour Check with school monogram Top and Dark Navy – Blue colour Lower)",
+      "Black colour shoes, Navy Blue colour socks with Maroon colour double rings atop"
+    ]
+  },
+  {
+    id: "6",
+    category: "primary-boys",
+    days: "Wednesday and Saturday",
+    description: "House uniform for Classes I to X Boys & Girls",
+    applicableClasses: "Classes I to X (Boys & Girls)",
+    season: "house",
+    items: [
+      "House T.Shirt with school monogram and black colour long trousers with strips of all the colours of the houses",
+      "White colour shoes, white colour socks with Carbon blue colour double rings atop"
+    ]
+  },
+  {
+    id: "7",
+    category: "winter",
+    days: "Winter Season",
+    description: "Winter uniform for LKG & UKG",
+    applicableClasses: "LKG & UKG",
+    season: "winter",
+    items: [
+      "Black colour Sweater and Black colour Woolen Cap with the Daily Uniform"
+    ]
+  },
+  {
+    id: "8",
+    category: "winter",
+    days: "Winter Season",
+    description: "Winter uniform for Classes I to X",
+    applicableClasses: "Classes I to X",
+    season: "winter",
+    items: [
+      "Maroon colour blazers, Maroon colour half sleeved sweaters and Maroon colour Woolen Cap with the Daily Uniform"
+    ]
+  }
+];
+
+// Library Regulations
+export const libraryRegulations: LibraryRegulation[] = [
+  {
+    id: "1",
+    title: "Book Borrowing Policy",
+    description: "Guidelines for borrowing and returning library books",
+    rules: [
+      "Students may borrow two books at a time for a period of one week using the library card",
+      "Books must be returned on time to avoid fines",
+      "If books are returned late, a fine of Rs. 10/- is charged per day for the book",
+      "If student is absent on the return day, books must be returned on the day they return to school with notification of absence in School Diary",
+      "Books to be renewed must be brought to the library on the date of return for renewal"
+    ],
+    fines: {
+      lateReturn: "Rs. 10/- per day per book",
+      damage: "Amount fixed by librarian to compensate loss/damage"
+    }
+  },
+  {
+    id: "2",
+    title: "Reference Books Policy",
+    description: "Rules for using reference materials",
+    rules: [
+      "Reference books are for consultation/reference only within the library",
+      "Reference books are not issued for home use",
+      "All reference work must be done in the library itself"
+    ]
+  },
+  {
+    id: "3",
+    title: "Library Conduct and Care",
+    description: "Behavioral guidelines and book care policies",
+    rules: [
+      "Library books should be handled carefully - no tearing/folding of papers",
+      "Students who damage or lose library books must pay compensation fixed by librarian",
+      "Students causing damage to library furniture will pay for repairs/replacement",
+      "Do not lend your library books or library card to others"
+    ]
+  },
+  {
+    id: "4",
+    title: "Library Environment Rules",
+    description: "Maintaining proper library atmosphere",
+    rules: [
+      "Silence must be observed at all times in the library",
+      "No eatables are allowed in the library",
+      "Use of mobile phones is strictly prohibited inside the library",
+      "The Librarian is available to help students"
+    ]
+  }
+];
+
+// Attendance and Punctuality Policies
+export const attendancePolicies: AttendancePolicy[] = [
+  {
+    id: "1",
+    category: "attendance",
+    title: "Regular Attendance Requirements",
+    description: "Mandatory attendance standards for all students",
+    rules: [
+      "Regular attendance is a key requisite for all students of St. Joseph's",
+      "Students must have minimum 75% attendance (examination board rule)",
+      "Students failing to meet attendance requirement will not receive promotion",
+      "Such students should repeat in the same class or be withdrawn",
+      "All students expected to attend on reopening day after vacation and day before vacation begins"
+    ]
+  },
+  {
+    id: "2",
+    category: "leave",
+    title: "Leave and Absence Procedures",
+    description: "Proper procedures for taking leave and handling absences",
+    rules: [
+      "No student may absent without obtaining leave previously in writing",
+      "For unplanned absence, submit parent/guardian letter stating reason upon return",
+      "Obtain permission from principal or vice principal before entering class",
+      "Parents/guardian must make entry in student's diary on 'Non-Attendance and Leave records' page",
+      "1-2 days absence: get diary signed by Class Teacher with leave application",
+      "3+ days absence: submit application signed by parent/guardian and countersigned by principal/vice principal",
+      "Medical absence of 3+ days must include medical certificate copy"
+    ],
+    penalties: [
+      {
+        type: "Excessive Leave",
+        amount: "Rs. 20/- per day",
+        consequence: "Fine for more than 20 days leave in a year"
+      },
+      {
+        type: "Absence without leave",
+        consequence: "Disciplinary action at discretion of principal/vice principal"
+      },
+      {
+        type: "Continuous unexplained absence",
+        consequence: "Name struck off rolls after 8+ working days, re-admission required"
+      }
+    ]
+  },
+  {
+    id: "3",
+    category: "punctuality",
+    title: "Punctuality and Late Coming",
+    description: "Standards for timely arrival and consequences for tardiness",
+    rules: [
+      "Punctuality is a main aspect of self-discipline",
+      "All students expected to be punctual for school arrival and all functions/activities",
+      "Students must arrive at school at least 10 minutes before first bell",
+      "Late students will not be admitted to class without principal/vice principal permission",
+      "Late coming data must be entered in appropriate diary page",
+      "Student council members may record ordinary delays in diary with date"
+    ],
+    penalties: [
+      {
+        type: "Late Coming Fine",
+        amount: "Rs. 20/- per day",
+        consequence: "Fine imposed after 5+ late days in a year, paid to class teacher"
+      }
+    ]
+  },
+  {
+    id: "4",
+    category: "withdrawal",
+    title: "Student Withdrawal and Dismissal",
+    description: "Policies regarding student departure and disciplinary actions",
+    rules: [
+      "No refund of fees for students who leave school or are dismissed",
+      "Students sent away or struck off rolls will not be re-admitted as a rule",
+      "Habitual idleness, disobedience, bad conduct, or contagious sickness can lead to dispersal",
+      "Transfer Certificate requires written application 3 days in advance",
+      "All dues must be cleared before T.C. issuance",
+      "T.C. fee: Rs. 200/-"
+    ]
+  }
+];
+
+// Arrival and Departure Policies
+export const arrivalDeparturePolicies: AttendancePolicy[] = [
+  {
+    id: "1",
+    category: "attendance",
+    title: "Arrival and Departure Guidelines",
+    description: "Safety and conduct rules for school arrival and departure",
+    rules: [
+      "Students must arrive at school at least 10 minutes before first bell",
+      "School does not provide transportation - parents responsible for arrangements",
+      "School not liable for student safety once they leave premises",
+      "All students must leave or be collected within 20 minutes of dispersal",
+      "Students expected to conduct themselves responsibly while traveling",
+      "After arrival, go directly to respective classes for first period or self-study",
+      "No playing, running around, or unnecessary noise after arrival",
+      "No staying back to play after dispersal except for enrolled activities",
+      "Follow instructions of watchman and assigned staff during arrival/departure",
+      "No arguments with security staff - they ensure safety and convenience"
+    ],
+    penalties: [
+      {
+        type: "Misconduct during travel",
+        consequence: "Expulsion from school for conduct contrary to discipline or injurious to school reputation"
+      },
+      {
+        type: "Leaving during school hours",
+        consequence: "Written permission from principal/vice principal required, gate pass needed"
+      }
+    ]
+  }
+];
+
+// Fee Payment Policies
+export const feePaymentPolicies: AttendancePolicy[] = [
+  {
+    id: "1",
+    category: "attendance",
+    title: "Fee Payment Schedule",
+    description: "Quarterly payment structure and deadlines for school fees",
+    rules: [
+      "School fees are to be paid in 4 quarters/installments",
+      "Quarterly installment must be paid by the 15th of the first month of that quarter",
+      "Late fee of Rs. 20/- per month applies if fees are not paid by the prescribed date",
+      "All dues must be paid up before each terminal exam irrespective of the due date",
+      "Students with overdue fees may be barred from sitting for exams",
+      "No student will be allowed to return until outstanding dues are settled in full",
+      "Students are liable to be charged full fee as long as their names are officially on the rolls"
+    ],
+    penalties: [
+      {
+        type: "Late Fee",
+        amount: "Rs. 20/- per month",
+        consequence: "Applied if fees not paid by prescribed date"
+      },
+      {
+        type: "Overdue Fees (30+ days)",
+        consequence: "Student's name liable to be struck off school rolls"
+      },
+      {
+        type: "Unpaid Fees at Exam Time",
+        consequence: "Student barred from exams and name struck off rolls"
+      }
+    ]
+  },
+  {
+    id: "2",
+    category: "withdrawal",
+    title: "Fee Payment Consequences",
+    description: "Consequences of non-payment and re-admission procedures",
+    rules: [
+      "Student's name liable to be struck off rolls if dues remain unpaid for more than 30 days",
+      "Re-admission only after previous dues are cleared and re-admission fees paid afresh",
+      "No student allowed to return until outstanding fee dues of previous term are settled",
+      "Bonafide Certificate issued from office after two working days when applied for"
+    ]
+  }
+];
+
+// Parent Guidelines and Responsibilities
+export const parentGuidelines: AttendancePolicy[] = [
+  {
+    id: "1",
+    category: "attendance",
+    title: "Parent Cooperation & Responsibilities",
+    description: "Essential guidelines for parent involvement in student education",
+    rules: [
+      "Parents must ensure regular attendance and discipline of their ward",
+      "Monitor ward's progress by checking diaries and notebooks regularly",
+      "Attend all school functions such as parent-teacher meetings and result days",
+      "If parent fails to attend parent-teacher meeting, ward cannot attend school until meeting with class teacher",
+      "Tutors, relatives, or unauthorized persons not allowed to attend meetings unless written request provided",
+      "Occasional reports from teachers must be countersigned as proof of reading",
+      "When communicating with school, include full name, standard, section, and roll number of ward"
+    ]
+  },
+  {
+    id: "2",
+    category: "leave",
+    title: "School Visit & Communication Guidelines",
+    description: "Proper procedures for school visits and communication",
+    rules: [
+      "Parents/guardians should not visit classes or interact with teachers without principal/vice principal approval",
+      "Bring ID card provided whenever visiting the school",
+      "Criticism of teachers and school in student's presence should be avoided",
+      "For legitimate complaints, meet principal or secretary without fear of reprisal",
+      "Parents cannot dictate terms to management - principal has discretionary power",
+      "Notify school in writing of any change in address/telephone number"
+    ]
+  },
+  {
+    id: "3",
+    category: "punctuality",
+    title: "Academic Expectations & Study Requirements",
+    description: "Academic standards and study requirements for students",
+    rules: [
+      "Students in higher classes should put in minimum 2.5 hours of private work/study at home daily",
+      "Home tasks must be done neatly and completely each day",
+      "Private tuitions not encouraged - students not permitted to take tuition from same school teachers",
+      "Violation of tuition rule will result in leaving the school",
+      "Students who are ill should not be sent to school for classes or tests"
+    ]
+  },
+  {
+    id: "4",
+    category: "withdrawal",
+    title: "Health & Safety Guidelines",
+    description: "Health protocols and safety measures for students",
+    rules: [
+      "If child reports being sick in school, they will be sent back home immediately",
+      "School provides only first aid - no medical treatment except first aid",
+      "In case of sickness or accident, parents will be called immediately",
+      "For prolonged illness, inform school and send child only after full recovery",
+      "Medical certificate required when returning from prolonged illness",
+      "Cases of illness settled based on term's work and previous records"
+    ]
+  },
+  {
+    id: "5",
+    category: "attendance",
+    title: "Disciplinary Actions & Grievances",
+    description: "Procedures for handling disciplinary matters and complaints",
+    rules: [
+      "No parent permitted to take action against any other student for misconduct",
+      "If parent takes such action, they will be asked to withdraw their ward",
+      "For grievances, lodge written complaint to principal with all details",
+      "If parent misbehaves with principal/teacher/staff, management empowered to strike off student's name",
+      "Parents must go through rules and regulations in diary - ignorance not an excuse",
+      "Management reserves right to amend, add, subtract or modify rules for better school running"
+    ]
+  }
+]; 

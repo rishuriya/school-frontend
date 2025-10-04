@@ -9,11 +9,10 @@ import {
   schoolApi, 
   programsApi
 } from '../../services/api';
-import { 
-  SchoolInfo, 
+import {  
   Program
 } from '../../types/school';
-
+import Image from 'next/image';
 export default function Programs() {
   // Removed unused schoolInfo state
   const [programs, setPrograms] = React.useState<Program[]>([]);
@@ -55,18 +54,30 @@ export default function Programs() {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white py-20">
+      <section className="relative py-24 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Academic Programs
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
+            Programs <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Overview</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-4xl mx-auto">
-            From Pre-K to High School: A Complete Educational Journey
+          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
+            Transparent programs overview for quality education
           </p>
-          <p className="text-lg text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            Our comprehensive academic programs provide a strong foundation for lifelong learning, from early childhood development to college preparation.
-          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 text-white font-semibold">
+              🧑‍🧑‍🧒 Education
+            </div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 text-white font-semibold">
+              📚 Overview
+            </div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 text-white font-semibold">
+              ⁇ Why
+            </div>
+          </div>
         </div>
       </section>
 
@@ -160,7 +171,7 @@ export default function Programs() {
               <Card key={program.id} variant="elevated" className="group hover:scale-105 transition-all duration-500">
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl mb-6 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 overflow-hidden">
                   {program.image ? (
-                    <img
+                    <Image
                       src={program.image}
                       alt={program.name}
                       className="w-full h-full object-cover"

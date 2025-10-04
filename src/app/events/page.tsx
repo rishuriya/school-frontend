@@ -6,14 +6,12 @@ import Footer from '../../components/layout/Footer';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { 
-  schoolApi, 
   eventsApi
 } from '../../services/api';
 import { 
-  SchoolInfo, 
   Event
 } from '../../types/school';
-
+import Image from 'next/image';
 export default function Events() {
   // Removed unused schoolInfo state
   const [events, setEvents] = React.useState<Event[]>([]);
@@ -102,9 +100,11 @@ export default function Events() {
               <Card key={event.id} variant="elevated" className="group hover:scale-105 transition-all duration-500 overflow-hidden">
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-xl overflow-hidden">
                   {event.image ? (
-                    <img
+                    <Image
                       src={event.image}
                       alt={event.title}
+                      width={500}
+                      height={500}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   ) : (
@@ -216,7 +216,7 @@ export default function Events() {
                       <Card key={event.id} variant="elevated" className="group hover:scale-105 transition-all duration-500 overflow-hidden">
                         <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-xl overflow-hidden">
                           {event.image ? (
-                            <img
+                            <Image
                               src={event.image}
                               alt={event.title}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"

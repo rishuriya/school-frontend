@@ -4,7 +4,7 @@ import React from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { Faculty } from '../../types/school';
-
+import Image from 'next/image';
 interface HeroesProps {
   heroes: Faculty[];
 }
@@ -72,8 +72,8 @@ const Heroes: React.FC<HeroesProps> = ({ heroes }) => {
               {/* Hero Image */}
               <div className="relative mb-6">
                 <div className="w-full h-64 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl overflow-hidden">
-                  <img
-                    src={hero.image}
+                  <Image
+                    src={hero.image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'}
                     alt={hero.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
