@@ -1,13 +1,14 @@
 export const APP_CONFIG = {
   // API Configuration
   api: {
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api',
-    useMockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || true, // Default to mock data
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api',
+    useMockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || false, // Use real data by default
     timeout: 10000, // 10 seconds
   },
   
   // School Information
   school: {
+    id: process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93', // School ID from backend
     name: 'Bright Future Academy',
     tagline: 'Empowering Minds, Building Futures',
     established: 1995,

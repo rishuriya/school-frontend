@@ -9,8 +9,11 @@ import Button from '../components/ui/Button';
 import Carousel from '../components/ui/Carousel';
 import Leadership from '../components/sections/Leadership';
 import Image from 'next/image';
-// Removed unused API imports
-import { 
+import schoolProfileService from '../services/schoolProfileService';
+import { APP_CONFIG } from '../config/app';
+import { SchoolProfile } from '../types/school';
+// Import mock data as fallback
+import {
   carouselData,
   mockSchoolInfo,
   mockNews,
@@ -19,17 +22,30 @@ import {
   mockStudents,
   mockPrograms
 } from '../data/mockData';
-import { 
-  SchoolInfo, 
-  NewsItem, 
-  Event, 
-  Student, 
+import {
+  SchoolInfo,
+  NewsItem,
+  Event,
+  Student,
   Program,
   Leadership as LeadershipType
 } from '../types/school';
 
+interface CarouselItem {
+  id: string;
+  image: string;
+  title: string;
+  subtitle?: string;
+  description: string;
+  ctaText?: string;
+  ctaLink?: string;
+}
+
 export default function Home() {
+  const [schoolProfile, setSchoolProfile] = React.useState<SchoolProfile | null>(null);
+  const [loading, setLoading] = React.useState(true);
   const [schoolInfo, setSchoolInfo] = React.useState<SchoolInfo | null>(null);
+  const [carousels, setCarousels] = React.useState<CarouselItem[]>([]);
   const [news, setNews] = React.useState<NewsItem[]>([]);
   const [events, setEvents] = React.useState<Event[]>([]);
   const [leadership, setLeadership] = React.useState<LeadershipType[]>([]);
@@ -39,20 +55,217 @@ export default function Home() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        // Use mock data directly for better performance and consistency
-        setSchoolInfo(mockSchoolInfo);
-        setNews(mockNews.slice(0, 3)); // Show only 3 latest news
-        setEvents(mockEvents.slice(0, 3)); // Show only 3 upcoming events
-        setLeadership(leadershipData); // Show all leadership
-        setStudents(mockStudents.slice(0, 3)); // Show only 3 students
-        setPrograms(mockPrograms.slice(0, 3)); // Show only 3 programs
+        setLoading(true);
+        // Fetch school profile from backend
+        const profile = await schoolProfileService.getSchoolProfileById(APP_CONFIG.school.id);
+        setSchoolProfile(profile);
+        
+        // Map backend data to frontend format
+        const mappedSchoolInfo: SchoolInfo = {
+          id: profile._id || '',
+          name: profile.name,
+          tagline: profile.profile?.vision?.substring(0, 100) || 'Excellence in Education',
+          description: profile.profile?.mission || '',
+          address: `${profile.address?.street || ''}, ${profile.address?.city || ''}, ${profile.address?.state || ''} ${profile.address?.zipCode || ''}`.trim(),
+          city: profile.address?.city || '',
+          phone: profile.contactPhone,
+          email: profile.contactEmail,
+          logo: profile.logoUrl,
+          website: profile.subdomain,
+          established: profile.profile?.established ? new Date(profile.profile.established).getFullYear() : 2000,
+        };
+        
+        setSchoolInfo(mappedSchoolInfo);
+
+        // Fetch data from backend
+        const baseUrl = APP_CONFIG.api.baseUrl;
+        const schoolId = profile._id;
+
+        // Fetch carousels
+        try {
+          const carouselsRes = await fetch(`${baseUrl}/public/school/${schoolId}/carousels`);
+          if (carouselsRes.ok) {
+            const carouselsData = await carouselsRes.json();
+            if (carouselsData.success && carouselsData.data) {
+              const mappedCarousels: CarouselItem[] = carouselsData.data.map((carousel: any) => ({
+                id: carousel._id,
+                image: carousel.image,
+                title: carousel.title,
+                subtitle: carousel.subtitle || '',
+                description: carousel.description,
+                ctaText: carousel.ctaText || 'Learn More',
+                ctaLink: carousel.ctaLink || '#',
+              }));
+              setCarousels(mappedCarousels.length > 0 ? mappedCarousels : carouselData);
+            } else {
+              setCarousels(carouselData);
+            }
+          } else {
+            setCarousels(carouselData);
+          }
+        } catch (error) {
+          console.error('Failed to fetch carousels:', error);
+          setCarousels(carouselData);
+        }
+
+        // Fetch announcements (convert to news format)
+        try {
+          const announcementsRes = await fetch(`${baseUrl}/public/school/${schoolId}/announcements?limit=3`);
+          if (announcementsRes.ok) {
+            const announcementsData = await announcementsRes.json();
+            if (announcementsData.success && announcementsData.data) {
+              const mappedNews: NewsItem[] = announcementsData.data.map((ann: { _id: string; title: string; content: string; publishDate: string; type: string; attachments?: string[] }) => ({
+                id: ann._id,
+                title: ann.title,
+                content: ann.content,
+                date: new Date(ann.publishDate).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                }),
+                author: 'Admin',
+                category: ann.type === 'urgent' ? 'announcement' : 'general',
+                image: ann.attachments?.[0] || undefined,
+              }));
+              setNews(mappedNews.length > 0 ? mappedNews : mockNews.slice(0, 3));
+            } else {
+              setNews(mockNews.slice(0, 3));
+            }
+          } else {
+            setNews(mockNews.slice(0, 3));
+          }
+        } catch (error) {
+          console.error('Failed to fetch announcements:', error);
+          setNews(mockNews.slice(0, 3));
+        }
+        
+        // Fetch events
+        try {
+          const eventsRes = await fetch(`${baseUrl}/public/school/${schoolId}/events?limit=3`);
+          if (eventsRes.ok) {
+            const eventsData = await eventsRes.json();
+            if (eventsData.success && eventsData.data) {
+              const mappedEvents: Event[] = eventsData.data.map((evt: { _id: string; title: string; description: string; startDate: string; location?: string; category?: string; imageUrl?: string }) => ({
+                id: evt._id,
+                title: evt.title,
+                description: evt.description,
+                date: new Date(evt.startDate).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                }),
+                time: new Date(evt.startDate).toLocaleTimeString('en-US', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                }),
+                location: evt.location || 'School Campus',
+                category: evt.category || 'general',
+                image: evt.imageUrl,
+              }));
+              setEvents(mappedEvents.length > 0 ? mappedEvents : mockEvents.slice(0, 3));
+            } else {
+              setEvents(mockEvents.slice(0, 3));
+            }
+          } else {
+            setEvents(mockEvents.slice(0, 3));
+          }
+        } catch (error) {
+          console.error('Failed to fetch events:', error);
+          setEvents(mockEvents.slice(0, 3));
+        }
+        
+        // Fetch teachers for leadership (filter those with messages/bio)
+        try {
+          const teachersRes = await fetch(`${baseUrl}/public/school/${schoolId}/teachers`);
+          if (teachersRes.ok) {
+            const teachersData = await teachersRes.json();
+            if (teachersData.success && teachersData.data) {
+              // Map teachers to leadership format (only those with message)
+              // Show ALL teachers who have message (no limit)
+              const mappedLeadership: LeadershipType[] = teachersData.data
+                .filter((teacher: { message?: string }) => teacher.message)
+                .map((teacher: { _id: string; firstName: string; lastName: string; position?: string; profileImage?: string; message?: string; email?: string; phone?: string; experience?: number; achievements?: string[] }) => ({
+                  id: teacher._id,
+                  name: `${teacher.firstName} ${teacher.lastName}`,
+                  position: teacher.position || 'Teacher',
+                  image: teacher.profileImage || undefined,
+                  message: teacher.message || 'Dedicated to student excellence.',
+                  email: teacher.email,
+                  phone: teacher.phone,
+                  experience: teacher.experience ? `${teacher.experience}+ years of experience` : 'New to the team',
+                  achievements: teacher.achievements || [],
+                }));
+              setLeadership(mappedLeadership.length > 0 ? mappedLeadership : leadershipData);
+            } else {
+              setLeadership(leadershipData);
+            }
+          } else {
+            setLeadership(leadershipData);
+          }
+        } catch (error) {
+          console.error('Failed to fetch teachers:', error);
+          setLeadership(leadershipData);
+        }
+        
+        // Fetch student leaders
+        try {
+          const studentsRes = await fetch(`${baseUrl}/public/school/${schoolId}/student-leaders?limit=6`);
+          if (studentsRes.ok) {
+            const studentsData = await studentsRes.json();
+            if (studentsData.success && studentsData.data) {
+              const mappedStudents: Student[] = studentsData.data.map((student: { _id: string; firstName: string; lastName: string; class: string; section: string; leadershipRole?: string; profileImage?: string; message?: string; achievements?: string[] }) => ({
+                id: student._id,
+                name: `${student.firstName} ${student.lastName}`,
+                class: student.class,
+                section: student.section,
+                achievement: student.leadershipRole || 'Student Leader',
+                image: student.profileImage,
+                description: student.message || 'Dedicated and hardworking student.',
+                achievements: student.achievements || [],
+              }));
+              setStudents(mappedStudents.length > 0 ? mappedStudents : mockStudents.slice(0, 3));
+            } else {
+              setStudents(mockStudents.slice(0, 3));
+            }
+          } else {
+            setStudents(mockStudents.slice(0, 3));
+          }
+        } catch (error) {
+          console.error('Failed to fetch student leaders:', error);
+          setStudents(mockStudents.slice(0, 3));
+        }
+        
+        // Use mock data for programs (these would need to be added to backend)
+        setPrograms(mockPrograms.slice(0, 3));
+        
+        setLoading(false);
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        console.error('Failed to fetch school data, using mock data:', error);
+        // Fallback to mock data
+        setSchoolInfo(mockSchoolInfo);
+        setCarousels(carouselData);
+        setNews(mockNews.slice(0, 3));
+        setEvents(mockEvents.slice(0, 3));
+        setLeadership(leadershipData);
+        setStudents(mockStudents.slice(0, 3));
+        setPrograms(mockPrograms.slice(0, 3));
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading school information...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,8 +273,8 @@ export default function Home() {
       
       {/* Hero Section with Carousel */}
       <section className="relative">
-        <Carousel 
-          items={carouselData}
+        <Carousel
+          items={carousels}
           autoPlay={true}
           interval={6000}
           showIndicators={true}
@@ -73,57 +286,123 @@ export default function Home() {
         />
       </section>
 
-      {/* About Section */}
-      <section className="py-16 bg-white">
+      {/* Goals Section - Only show goals with icons */}
+      {schoolProfile?.profile?.goals && 
+       schoolProfile.profile.goals.filter(goal => goal.icon).length > 0 &&
+       schoolProfile.profile.layout?.sections?.goals?.show !== false && (() => {
+        // Filter goals that have icons/emojis
+        const goalsWithIcons = schoolProfile.profile.goals.filter(goal => goal.icon);
+        const sortedGoals = [...goalsWithIcons].sort((a, b) => (a.order || 0) - (b.order || 0));
+        const template = schoolProfile.profile.layout?.sections?.goals?.template || 'grid';
+        
+        // Helper to render goal icon
+        const renderGoalIcon = (goal: any, index: number) => {
+          const icon = goal.icon;
+          if (icon) {
+            // Check if it's an emoji
+            if (icon.match(/[\u{1F300}-\u{1F9FF}]/u)) {
+              return <span className="text-4xl">{icon}</span>;
+            }
+            // Otherwise render as SVG (fallback - we're using emojis from admin)
+            return <span className="text-4xl">{icon}</span>;
+          }
+          return null;
+        };
+
+        return (
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              About {schoolInfo?.name || 'St. Joseph Catholic School'}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Our Goals
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              {schoolInfo?.description || 'St. Joseph Catholic School is one of the Educational institutes of the Catholic Diocese of Buxar. This school is motivated by the teachings of Jesus Christ, promoting human values and excellence in each one.'}
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              Strategic goals that guide our educational mission and community development.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card variant="elevated" className="text-center group bg-white">
-              <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
+
+            {/* Grid Layout */}
+            {template === 'grid' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {sortedGoals.map((goal, index) => (
+                  <Card key={index} variant="elevated" className="text-center group bg-white">
+                    <div className={`w-16 h-16 ${
+                      index % 4 === 0 ? 'bg-purple-600' :
+                      index % 4 === 1 ? 'bg-slate-500' :
+                      index % 4 === 2 ? 'bg-green-600' :
+                      'bg-orange-600'
+                    } rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      {renderGoalIcon(goal, index)}
+                  </div>
+                    <p className="text-gray-600 leading-relaxed text-sm">{goal.text}</p>
+                </Card>
+                ))}
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Christian Formation</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                Developing students as men and women of character, competence, conscience and compassion, committed to build a just society.
-              </p>
-            </Card>
-            
-            <Card variant="elevated" className="text-center group bg-white">
-              <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+            )}
+
+            {/* List Layout */}
+            {template === 'list' && (
+              <div className="max-w-3xl mx-auto space-y-4">
+                {sortedGoals.map((goal, index) => (
+                  <Card key={index} variant="elevated" className="bg-white">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        {renderGoalIcon(goal, index)}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed flex-1">{goal.text}</p>
+                  </div>
+                </Card>
+                ))}
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Moral Values</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                Instilling love, joy, fellowship, hard work and sincerity as prominent elements in student formation through Christian teachings.
-              </p>
-            </Card>
-            
-            <Card variant="elevated" className="text-center group bg-white">
-              <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+            )}
+
+            {/* Timeline Layout */}
+            {template === 'timeline' && (
+              <div className="max-w-4xl mx-auto">
+                {sortedGoals.map((goal, index) => (
+                  <div key={index} className="flex gap-6 mb-8 last:mb-0">
+                    <div className="flex flex-col items-center">
+                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                        {renderGoalIcon(goal, index)}
+                      </div>
+                      {index < sortedGoals.length - 1 && (
+                        <div className="w-0.5 h-full bg-blue-200 mt-2"></div>
+                      )}
+                    </div>
+                    <Card variant="elevated" className="flex-1 bg-white">
+                      <p className="text-gray-700 leading-relaxed">{goal.text}</p>
+                    </Card>
+                  </div>
+                ))}
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">Service to Community</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                Providing quality education that is relevant to all and in particular to the marginalized in the diocese of Buxar.
-              </p>
-            </Card>
+            )}
+
+            {/* Cards Layout (Default) */}
+            {template === 'cards' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {sortedGoals.map((goal, index) => {
+                  const colors = [
+                    { bg: 'bg-blue-600', border: 'border-blue-200', gradient: 'from-blue-50 to-blue-100' },
+                    { bg: 'bg-green-600', border: 'border-green-200', gradient: 'from-green-50 to-green-100' },
+                    { bg: 'bg-purple-600', border: 'border-purple-200', gradient: 'from-purple-50 to-purple-100' },
+                  ];
+                  const color = colors[index % 3];
+
+                  return (
+                    <Card key={index} variant="elevated" className={`text-center group bg-gradient-to-br ${color.gradient} border-2 ${color.border}`}>
+                      <div className={`w-16 h-16 ${color.bg} rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300`}>
+                        {renderGoalIcon(goal, index)}
+                  </div>
+                      <p className="text-gray-700 leading-relaxed font-medium">{goal.text}</p>
+                </Card>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+        );
+      })()}
 
       {/* Leadership Section */}
       <Leadership leaders={leadership} />
@@ -148,6 +427,8 @@ export default function Home() {
                     <Image
                       src={program.image}
                       alt={program.name}
+                      width={400}
+                      height={400}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -209,6 +490,8 @@ export default function Home() {
                       <Image
                         src={item.image}
                         alt={item.title}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -316,6 +599,8 @@ export default function Home() {
                       <Image
                         src={event.image}
                         alt={event.title}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -435,6 +720,8 @@ export default function Home() {
                       <Image
                         src={student.image}
                         alt={student.name}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -462,6 +749,7 @@ export default function Home() {
                   </h3>
                   <p className="text-purple-600 font-semibold mb-4 text-sm">{student.grade}</p>
                   
+                  {student.achievements && student.achievements.length > 0 && (
                   <div className="space-y-2 mb-4">
                     {student.achievements.slice(0, 2).map((achievement, index) => (
                       <div key={index} className="text-xs text-gray-700 bg-purple-50 px-3 py-2 rounded-lg border border-purple-100">
@@ -479,6 +767,7 @@ export default function Home() {
                       </div>
                     )}
                   </div>
+                  )}
                   
                   <Link href="/students">
                     <Button variant="outline" size="sm" className="group-hover:bg-purple-50 group-hover:border-purple-200 group-hover:text-purple-600 transition-all duration-200">

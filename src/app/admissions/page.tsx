@@ -5,12 +5,12 @@ import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { 
-  schoolApi
-} from '../../services/api';
+import schoolProfileService from '../../services/schoolProfileService';
+import { APP_CONFIG } from '../../config/app';
 import { 
   SchoolInfo,
-  Program
+  Program,
+  SchoolProfile
 } from '../../types/school';
 import { 
   mockSchoolInfo,
@@ -19,6 +19,8 @@ import {
 
 import Image from 'next/image';
 export default function Admissions() {
+  const [schoolProfile, setSchoolProfile] = React.useState<SchoolProfile | null>(null);
+  const [loading, setLoading] = React.useState(true);
   const [schoolInfo, setSchoolInfo] = React.useState<SchoolInfo | null>(mockSchoolInfo);
   const [activeTab, setActiveTab] = useState('process');
   const [programs] = React.useState<Program[]>(mockPrograms);
@@ -26,98 +28,74 @@ export default function Admissions() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const school = await schoolApi.getSchoolInfo();
-        setSchoolInfo(school);
+        setLoading(true);
+        // Fetch school profile from backend
+        const profile = await schoolProfileService.getSchoolProfileById(APP_CONFIG.school.id);
+        setSchoolProfile(profile);
+        
+        // Map backend data to frontend format
+        const mappedSchoolInfo: SchoolInfo = {
+          id: profile._id || '',
+          name: profile.name,
+          tagline: profile.profile?.vision?.substring(0, 100) || 'Excellence in Education',
+          description: profile.profile?.mission || '',
+          address: `${profile.address?.street || ''}, ${profile.address?.city || ''}, ${profile.address?.state || ''} ${profile.address?.zipCode || ''}`.trim(),
+          city: profile.address?.city || '',
+          phone: profile.contactPhone,
+          email: profile.contactEmail,
+          logo: profile.logoUrl,
+          website: profile.subdomain,
+          established: profile.profile?.established ? new Date(profile.profile.established).getFullYear() : 2000,
+        };
+        
+        setSchoolInfo(mappedSchoolInfo);
+        setLoading(false);
       } catch (error) {
         console.error('Failed to fetch data:', error);
         // Use mock data as fallback
         setSchoolInfo(mockSchoolInfo);
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  const admissionSteps = [
-    {
-      step: 1,
-      title: "Admission Inquiry (January)",
-      description: "Admission process begins in the first week of January. Contact us to learn about our programs and schedule a campus visit.",
-      duration: "First week of January",
-      requirements: ["Initial contact", "Information request", "Campus tour scheduling", "Age verification for L.K.G."]
-    },
-    {
-      step: 2,
-      title: "Application Submission",
-      description: "Complete and submit the application form with all required documents. For L.K.G. admission, age must be as per NEP 2020 guidelines.",
-      duration: "January - February",
-      requirements: ["Application form", "Birth certificate", "Previous school records (if applicable)", "Health records", "Application fee"]
-    },
-    {
-      step: 3,
-      title: "Documentation Review",
-      description: "For Class 2 or higher, provide School Leaving Certificate, PEN Number, and APAAR ID from previous institution.",
-      duration: "February - March",
-      requirements: ["School Leaving Certificate", "PEN Number", "APAAR ID", "Academic records", "Transfer certificate"]
-    },
-    {
-      step: 4,
-      title: "Merit-Based Selection",
-      description: "Management evaluates applications based on overall merit. No donations, recommendations, or influence accepted.",
-      duration: "March - April",
-      requirements: ["Merit evaluation", "Management review", "Seat availability check", "Eligibility verification"]
-    },
-    {
-      step: 5,
-      title: "Admission Confirmation",
-      description: "Complete enrollment process for the new academic session. No mid-session admissions allowed.",
-      duration: "April - May",
-      requirements: ["Admission confirmation", "Fee payment", "Document submission", "Academic session preparation"]
-    }
-  ];
+  // Get admission info from backend
+  const admissionInfo = schoolProfile?.profile?.admissionInfo;
+  const isAdmissionOpen = admissionInfo?.isOpen ?? false;
+  const admissionProcess = admissionInfo?.process;
+  const admissionRequirements = admissionInfo?.requirements || [];
+  const admissionFees = admissionInfo?.fees;
+  const admissionPolicy = admissionInfo?.policy;
+  const admissionContact = {
+    phone: admissionInfo?.contactNumber || schoolProfile?.contactPhone,
+    email: admissionInfo?.contactEmail || schoolProfile?.contactEmail
+  };
+  const admissionStartDate = admissionInfo?.startDate ? new Date(admissionInfo.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
+  const admissionEndDate = admissionInfo?.endDate ? new Date(admissionInfo.endDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
+  const importantDates = admissionInfo?.importantDates || [];
+  const admissionFaqs = admissionInfo?.faqs || [];
+  const admissionTemplate = schoolProfile?.profile?.layout?.sections?.admission?.template || 'banner';
+  
+  // Get layout templates for each admission subsection
+  const layoutSections = schoolProfile?.profile?.layout?.sections;
+  const processTemplate = (layoutSections as any)?.admissionProcess?.template || 'numbered';
+  const policyTemplate = (layoutSections as any)?.admissionPolicy?.template || 'numbered';
+  const datesTemplate = (layoutSections as any)?.admissionDates?.template || 'grid';
+  const faqsTemplate = (layoutSections as any)?.admissionFaqs?.template || 'grid';
+  const feesTemplate = (layoutSections as any)?.admissionFees?.template || 'table';
 
-  const requirements = [
-    {
-      category: "L.K.G. Admission Requirements",
-      items: [
-        "Age as per NEP 2020 (New Education Policy) guidelines",
-        "Birth certificate with date of birth verification",
-        "Health and immunization records",
-        "Completed application form",
-        "Recent photographs (passport size)"
-      ]
-    },
-    {
-      category: "Higher Class Requirements (Class 2+)",
-      items: [
-        "School Leaving Certificate from previous institution",
-        "PEN Number (Permanent Education Number)",
-        "APAAR ID (Automated Permanent Academic Account Registry)",
-        "Transfer Certificate from last school",
-        "Previous academic records and transcripts"
-      ]
-    },
-    {
-      category: "Program-Specific Requirements",
-      items: programs.slice(0, 3).map(program => `${program.name}: ${program.requirements.join(', ')}`)
-    }
-  ];
-
-  const importantDates = [
-    {
-      period: "Academic Year 2024-25",
-      dates: [
-        { event: "Admission Process Begins", date: "First week of January 2024" },
-        { event: "L.K.G. Applications Open", date: "January 1-15, 2024" },
-        { event: "Higher Class Applications (if seats available)", date: "January 15 - February 15, 2024" },
-        { event: "Document Submission Deadline", date: "March 15, 2024" },
-        { event: "Merit Evaluation & Selection", date: "March 16 - April 15, 2024" },
-        { event: "Admission Results Announcement", date: "April 20, 2024" },
-        { event: "Fee Payment & Documentation", date: "April 21 - May 15, 2024" },
-        { event: "Academic Year Begins", date: "July 1, 2024" }
-      ]
-    }
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading admissions information...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -219,7 +197,7 @@ export default function Admissions() {
         </div>
       </section>
 
-      {/* Application Process */}
+      {/* Application Process - Dynamic from Backend */}
       {activeTab === 'process' && (
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -237,53 +215,140 @@ export default function Admissions() {
               </p>
             </div>
             
-            <div className="space-y-8">
-              {admissionSteps.map((step, index) => (
-                <Card key={step.step} variant="elevated" className="relative bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-slate-500">
-                  <div className="flex flex-col lg:flex-row items-start gap-6">
-                    <div className="flex-shrink-0">
-                      <div className="w-16 h-16 bg-slate-600 rounded-lg flex items-center justify-center text-white text-xl font-bold">
-                        {step.step}
+            {/* Admission Status Banner */}
+            <div className="mb-12">
+              <Card variant="elevated" className={`p-6 ${isAdmissionOpen ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isAdmissionOpen ? 'bg-green-600' : 'bg-red-600'}`}>
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {isAdmissionOpen ? (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        ) : (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        )}
+                      </svg>
                       </div>
+                    <div>
+                      <h3 className={`text-2xl font-bold ${isAdmissionOpen ? 'text-green-900' : 'text-red-900'}`}>
+                        Admissions {isAdmissionOpen ? 'Now Open!' : 'Closed'}
+                        </h3>
+                      <p className={`text-sm ${isAdmissionOpen ? 'text-green-700' : 'text-red-700'}`}>
+                        {isAdmissionOpen 
+                          ? `Apply now! ${admissionStartDate && admissionEndDate ? `From ${admissionStartDate} to ${admissionEndDate}` : ''}`
+                          : 'Admissions are currently closed. Please check back later.'}
+                      </p>
+                    </div>
+                  </div>
+                  {isAdmissionOpen && (
+                    <Button variant="gradient" size="lg">
+                      Apply Now
+                    </Button>
+                  )}
+                  </div>
+                </Card>
                     </div>
                     
-                    <div className="flex-1">
-                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 lg:mb-0">
-                          {step.title}
-                        </h3>
-                        <span className="inline-block bg-slate-100 text-slate-800 text-sm font-medium px-3 py-1 rounded-md">
-                          {step.duration}
-                        </span>
+            {/* Process Steps - Dynamic from Backend with Template Support */}
+            {admissionProcess && Array.isArray(admissionProcess) && admissionProcess.length > 0 ? (
+              <div className="max-w-4xl mx-auto">
+                {/* Numbered Template (Default) */}
+                {processTemplate === 'numbered' && (
+                  <div className="space-y-6">
+                    {admissionProcess.map((step, index) => (
+                      <Card key={index} variant="elevated" className="bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-600">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            {index + 1}
                       </div>
-                      
-                      <p className="text-gray-600 mb-4 leading-relaxed">
-                        {step.description}
-                      </p>
-                      
-                      <div>
-                        <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                          Requirements:
-                        </h4>
-                        <ul className="space-y-1">
-                          {step.requirements.map((requirement, idx) => (
-                            <li key={idx} className="flex items-start text-sm text-gray-600">
-                              <div className="w-1.5 h-1.5 bg-slate-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                              {requirement}
-                            </li>
-                          ))}
-                        </ul>
+                          <div className="flex-1 pt-2">
+                            <p className="text-lg text-gray-700 leading-relaxed">{step}</p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Timeline Template */}
+                {processTemplate === 'timeline' && (
+                  <div className="relative">
+                    <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-blue-600 to-purple-600"></div>
+                    <div className="space-y-8">
+                      {admissionProcess.map((step, index) => (
+                        <div key={index} className="relative flex items-start gap-6">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg z-10">
+                            {index + 1}
+                          </div>
+                          <Card variant="elevated" className="flex-1 bg-white hover:shadow-xl transition-all duration-300">
+                            <p className="text-lg text-gray-700 leading-relaxed">{step}</p>
+                          </Card>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cards Template */}
+                {processTemplate === 'cards' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {admissionProcess.map((step, index) => (
+                      <Card key={index} variant="elevated" className="bg-gradient-to-br from-blue-50 to-purple-50 hover:shadow-xl transition-all duration-300 border-2 border-blue-200">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                            {index + 1}
+                          </div>
+                          <h4 className="text-xl font-bold text-gray-900">Step {index + 1}</h4>
+                        </div>
+                        <p className="text-gray-700 leading-relaxed">{step}</p>
+                      </Card>
+                    ))}
                       </div>
+                )}
+
+                {/* Checklist Template */}
+                {processTemplate === 'checklist' && (
+                  <div className="space-y-4">
+                    {admissionProcess.map((step, index) => (
+                      <Card key={index} variant="elevated" className="bg-white hover:shadow-lg transition-all duration-300">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white mt-1">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-lg text-gray-700 leading-relaxed">{step}</p>
                     </div>
                   </div>
                 </Card>
               ))}
             </div>
+                )}
+              </div>
+            ) : (
+              <Card variant="elevated" className="p-12 text-center bg-gray-50">
+                <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Admission Process Information Coming Soon
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Detailed admission process information will be available here. Please contact the school administration for more details.
+                </p>
+                <Button variant="outline" size="lg">
+                  Contact Admissions Office
+                </Button>
+              </Card>
+            )}
           </div>
         </section>
       )}
 
-      {/* Requirements */}
+      {/* Requirements - Dynamic from Backend */}
       {activeTab === 'requirements' && (
         <section className="py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -301,23 +366,131 @@ export default function Admissions() {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {requirements.map((category, index) => (
+            {admissionRequirements.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                  {admissionRequirements.map((requirement, index) => (
                 <Card key={index} variant="elevated" className="h-fit bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-emerald-500">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
-                    {category.category}
-                  </h3>
-                  <ul className="space-y-3">
-                    {category.items.map((item, idx) => (
-                      <li key={idx} className="flex items-start">
-                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-gray-600 text-sm leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                      <div className="flex items-start gap-3 mb-2">
+                        <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                          <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <p className="text-gray-700 leading-relaxed">{requirement}</p>
+                      </div>
                 </Card>
               ))}
             </div>
+
+                {/* Fees Information if available - with Template Support */}
+                {admissionFees && Array.isArray(admissionFees) && admissionFees.length > 0 && (
+                  <div className="mt-12">
+                    {/* Table Template (Default) */}
+                    {feesTemplate === 'table' && (
+                      <Card variant="elevated" className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                          </div>
+                          <h3 className="text-2xl font-bold text-gray-900">
+                            Fee Structure
+                          </h3>
+                        </div>
+                        
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b-2 border-blue-300">
+                                <th className="text-left py-3 px-4 font-bold text-gray-900 bg-blue-100 rounded-tl-lg">Category</th>
+                                <th className="text-left py-3 px-4 font-bold text-gray-900 bg-blue-100">Amount</th>
+                                <th className="text-left py-3 px-4 font-bold text-gray-900 bg-blue-100 rounded-tr-lg">Description</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {admissionFees.map((fee, index) => (
+                                <tr key={index} className={`border-b border-blue-200 ${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/50'} hover:bg-blue-100/50 transition-colors duration-150`}>
+                                  <td className="py-4 px-4 font-semibold text-gray-900">{fee.category}</td>
+                                  <td className="py-4 px-4 text-blue-700 font-bold text-lg">{fee.amount}</td>
+                                  <td className="py-4 px-4 text-gray-700">{fee.description || '-'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </Card>
+                    )}
+
+                    {/* Cards Template */}
+                    {feesTemplate === 'cards' && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {admissionFees.map((fee, index) => (
+                          <Card key={index} variant="elevated" className="bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-xl transition-all duration-300 border-2 border-green-200">
+                            <div className="flex items-start gap-3 mb-4">
+                              <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                </svg>
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="text-lg font-bold text-gray-900 mb-2">{fee.category}</h4>
+                                <p className="text-2xl font-bold text-green-700">{fee.amount}</p>
+                              </div>
+                            </div>
+                            {fee.description && (
+                              <p className="text-sm text-gray-600 border-t border-green-200 pt-3 mt-3">
+                                {fee.description}
+                              </p>
+                            )}
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Detailed Template */}
+                    {feesTemplate === 'detailed' && (
+                      <div className="space-y-4">
+                        {admissionFees.map((fee, index) => (
+                          <Card key={index} variant="elevated" className="bg-white hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
+                                  {index + 1}
+                                </div>
+                                <h4 className="text-xl font-bold text-gray-900">{fee.category}</h4>
+                              </div>
+                              <span className="text-2xl font-bold text-blue-700">{fee.amount}</span>
+                            </div>
+                            {fee.description && (
+                              <p className="text-gray-600 leading-relaxed pl-11">{fee.description}</p>
+                            )}
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <Card variant="elevated" className="p-12 text-center bg-gray-50">
+                <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Requirements Information Coming Soon
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Detailed requirements will be available here. Please contact the school administration for current requirements.
+                </p>
+                <Button variant="outline" size="lg">
+                  Contact Admissions Office
+                </Button>
+              </Card>
+            )}
             
             <div className="mt-12 text-center">
               <Card variant="elevated" className="p-6 bg-emerald-50 border border-emerald-200">
@@ -337,15 +510,6 @@ export default function Admissions() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Button>
-                  <Button variant="outline" size="lg" className="group hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition-all duration-200">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Download Checklist
-                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Button>
                 </div>
               </Card>
             </div>
@@ -353,7 +517,7 @@ export default function Admissions() {
         </section>
       )}
 
-      {/* Important Dates */}
+      {/* Important Dates - Dynamic from Backend */}
       {activeTab === 'dates' && (
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -371,51 +535,244 @@ export default function Admissions() {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {importantDates.map((period, index) => (
-                <Card key={index} variant="elevated" className="bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-amber-500">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
-                    {period.period}
-                  </h3>
-                  <div className="space-y-3">
-                    {period.dates.map((date, idx) => (
-                      <div key={idx} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                        <span className="text-gray-700 font-medium text-sm">{date.event}</span>
-                        <span className="text-amber-600 font-semibold text-sm">{date.date}</span>
-                      </div>
+            {importantDates.length > 0 ? (
+              <>
+                {/* Grid Template (Default) */}
+                {datesTemplate === 'grid' && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+                    {[...importantDates].sort((a, b) => a.order - b.order).map((dateItem, index) => (
+                      <Card key={index} variant="elevated" className="bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-amber-500">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0">
+                            <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">
+                              {dateItem.title}
+                            </h3>
+                            <p className="text-amber-600 font-semibold text-sm mb-2">
+                              {new Date(dateItem.date).toLocaleDateString('en-US', { 
+                                weekday: 'long',
+                                month: 'long', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                              })}
+                            </p>
+                            {dateItem.description && (
+                              <p className="text-gray-600 text-sm leading-relaxed">
+                                {dateItem.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
                     ))}
                   </div>
-                </Card>
-              ))}
-            </div>
+                )}
+
+                {/* Timeline Template */}
+                {datesTemplate === 'timeline' && (
+                  <div className="max-w-4xl mx-auto mb-12">
+                    <div className="relative">
+                      <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gradient-to-b from-amber-500 to-orange-600"></div>
+                      <div className="space-y-8">
+                        {[...importantDates].sort((a, b) => a.order - b.order).map((dateItem, index) => (
+                          <div key={index} className="relative flex items-start gap-6">
+                            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg z-10">
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <Card variant="elevated" className="flex-1 bg-white hover:shadow-xl transition-all duration-300">
+                              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                {dateItem.title}
+                              </h3>
+                              <p className="text-amber-600 font-semibold text-sm mb-2">
+                                {new Date(dateItem.date).toLocaleDateString('en-US', { 
+                                  weekday: 'long',
+                                  month: 'long', 
+                                  day: 'numeric', 
+                                  year: 'numeric' 
+                                })}
+                              </p>
+                              {dateItem.description && (
+                                <p className="text-gray-600 text-sm leading-relaxed">
+                                  {dateItem.description}
+                                </p>
+                              )}
+                            </Card>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* List Template */}
+                {datesTemplate === 'list' && (
+                  <div className="max-w-4xl mx-auto mb-12 space-y-4">
+                    {[...importantDates].sort((a, b) => a.order - b.order).map((dateItem, index) => (
+                      <Card key={index} variant="elevated" className="bg-white hover:shadow-lg transition-all duration-300 border-l-4 border-l-amber-500">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-sm font-bold">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-900">
+                                {dateItem.title}
+                              </h3>
+                              {dateItem.description && (
+                                <p className="text-gray-600 text-sm mt-1">
+                                  {dateItem.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-amber-600 font-semibold text-sm">
+                              {new Date(dateItem.date).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Calendar Template */}
+                {datesTemplate === 'calendar' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    {[...importantDates].sort((a, b) => a.order - b.order).map((dateItem, index) => {
+                      const date = new Date(dateItem.date);
+                      const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+                      const day = date.getDate();
+                      const year = date.getFullYear();
+                      
+                      return (
+                        <Card key={index} variant="elevated" className="bg-white hover:shadow-xl transition-all duration-300 overflow-hidden">
+                          <div className="flex">
+                            <div className="w-20 bg-gradient-to-br from-amber-500 to-orange-600 text-white flex flex-col items-center justify-center p-3">
+                              <span className="text-xs font-bold">{month}</span>
+                              <span className="text-3xl font-bold">{day}</span>
+                              <span className="text-xs">{year}</span>
+                            </div>
+                            <div className="flex-1 p-4">
+                              <h3 className="font-bold text-gray-900 mb-2">
+                                {dateItem.title}
+                              </h3>
+                              {dateItem.description && (
+                                <p className="text-gray-600 text-sm leading-relaxed">
+                                  {dateItem.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Admission Status Summary */}
+                {(admissionStartDate || admissionEndDate) && (
+                  <Card variant="elevated" className="p-8 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 mb-12">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isAdmissionOpen ? 'bg-green-600' : 'bg-red-600'}`}>
+                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {isAdmissionOpen ? (
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            ) : (
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            )}
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                            Admissions {isAdmissionOpen ? 'Open' : 'Closed'}
+                          </h3>
+                          <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+                            {admissionStartDate && (
+                              <span className="flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>Starts: <strong>{admissionStartDate}</strong></span>
+                              </span>
+                            )}
+                            {admissionEndDate && (
+                              <span className="flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Ends: <strong>{admissionEndDate}</strong></span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {isAdmissionOpen && (
+                        <Button variant="gradient" size="lg">
+                          Apply Now
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+                )}
+              </>
+            ) : (
+              <Card variant="elevated" className="p-12 text-center bg-gray-50 max-w-3xl mx-auto">
+                <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Admission Dates Coming Soon
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Important admission dates will be announced here. Please contact the school for more information.
+                </p>
+                <Button variant="outline" size="lg">
+                  Contact Admissions Office
+                </Button>
+              </Card>
+            )}
             
             <div className="mt-12 text-center">
               <Card variant="elevated" className="p-6 bg-amber-50 border border-amber-200">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Important Notice: {schoolInfo?.name || 'St. Joseph Catholic School'} Admission Policy
+                  Need More Information?
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  As a minority institution, {schoolInfo?.name || 'St. Joseph Catholic School'} has the constitutional right to admit students according to our policy. <strong>Admissions begin in the first week of January</strong> and are primarily for L.K.G. class. Higher class admissions are considered only if vacancies are available. No mid-session admissions are allowed.
+                  Contact our admissions office for the latest information about admission dates, deadlines, and procedures.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button variant="outline" size="lg" className="group hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 transition-all duration-200">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Download Admission Calendar
-                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Button>
+                  {admissionContact.phone && (
                   <Button variant="outline" size="lg" className="group hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 transition-all duration-200">
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
-                    Contact Admissions Office
-                    <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                      {admissionContact.phone}
                   </Button>
+                  )}
+                  {admissionContact.email && (
+                  <Button variant="outline" size="lg" className="group hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 transition-all duration-200">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                      {admissionContact.email}
+                  </Button>
+                  )}
                 </div>
               </Card>
             </div>
@@ -448,6 +805,8 @@ export default function Admissions() {
                     <Image
                       src={program.image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'} 
                       alt={program.name}
+                      width={400}
+                      height={400}
                       className="w-full h-40 object-cover"
                     />
                   </div>
@@ -528,103 +887,142 @@ export default function Admissions() {
         </section>
       )}
 
-      {/* Admission Policy */}
+      {/* Admission Policy - Dynamic from Backend */}
       {activeTab === 'policy' && (
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-6">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
                 Admission Policy
               </h2>
               <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-                St. Joseph&apos;s Catholic School is a minority institution with specific admission rights and policies as per the Constitution of India.
+                Please read our admission policy carefully to understand our admission process and requirements.
               </p>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-              <Card variant="elevated" className="p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Minority Institution Rights</h3>
+            {admissionPolicy && Array.isArray(admissionPolicy) && admissionPolicy.length > 0 ? (
+              <div className="max-w-5xl mx-auto">
+                {/* Numbered Template (Default) */}
+                {policyTemplate === 'numbered' && (
+                  <Card variant="elevated" className="p-8 bg-white">
                 <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-gray-600">Right to admit and retain students according to school policy</span>
+                      {admissionPolicy.map((policyPoint, index) => (
+                        <li key={index} className="flex items-start gap-4">
+                          <span className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-base font-bold mt-0.5">
+                            {index + 1}
+                          </span>
+                          <span className="flex-1 leading-relaxed text-lg text-gray-700">{policyPoint}</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-gray-600">Constitutional right upheld by Supreme Court of India</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-gray-600">Compliance with RTE provisions and appropriate authority instructions</span>
-                  </li>
+                      ))}
                 </ul>
               </Card>
+                )}
 
-              <Card variant="elevated" className="p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Admission Guidelines</h3>
+                {/* Cards Template */}
+                {policyTemplate === 'cards' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {admissionPolicy.map((policyPoint, index) => (
+                      <Card key={index} variant="elevated" className="bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-xl transition-all duration-300 border-l-4 border-l-purple-500">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
+                            {index + 1}
+                          </div>
+                          <p className="flex-1 text-gray-700 leading-relaxed">{policyPoint}</p>
+                        </div>
+              </Card>
+                    ))}
+            </div>
+                )}
+
+                {/* Accordion Template */}
+                {policyTemplate === 'accordion' && (
+                  <div className="space-y-3">
+                    {admissionPolicy.map((policyPoint, index) => (
+                      <Card key={index} variant="elevated" className="bg-white overflow-hidden">
+                        <details className="group">
+                          <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                            <div className="flex items-center gap-4">
+                              <div className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
+                                {index + 1}
+                              </div>
+                              <span className="font-semibold text-gray-900">Policy Point {index + 1}</span>
+                            </div>
+                            <svg className="w-5 h-5 text-gray-500 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </summary>
+                          <div className="px-6 pb-6 pt-2 border-t">
+                            <p className="text-gray-700 leading-relaxed">{policyPoint}</p>
+                          </div>
+                        </details>
+              </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Card variant="elevated" className="p-12 text-center bg-gray-50 max-w-3xl mx-auto">
+                <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+            </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Admission Policy Coming Soon
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Our detailed admission policy will be available here soon. Please contact the admissions office for more information.
+                </p>
+                <Button variant="outline" size="lg">
+                  Contact Admissions Office
+                </Button>
+              </Card>
+            )}
+            
+            {/* Admission Rules from Backend */}
+            {schoolProfile?.profile?.rules?.admission && Array.isArray(schoolProfile.profile.rules.admission) && schoolProfile.profile.rules.admission.length > 0 && (
+              <div className="mt-12">
+                <Card variant="elevated" className="p-8 max-w-5xl mx-auto bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <span className="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </span>
+                    Admission Rules & Guidelines
+                  </h3>
                 <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-gray-600">Admission process begins first week of January</span>
+                    {schoolProfile.profile.rules.admission.map((rule, index) => (
+                      <li key={index} className="flex items-start gap-4 text-gray-700">
+                        <span className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold mt-0.5">
+                          {index + 1}
+                        </span>
+                        <span className="flex-1 leading-relaxed text-lg">{rule}</span>
                   </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-gray-600">Primary focus on L.K.G. class admissions</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-gray-600">Higher classes only if vacancies available</span>
-                  </li>
+                    ))}
                 </ul>
               </Card>
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card variant="elevated" className="p-8 bg-red-50 border-red-200">
-                <h3 className="text-2xl font-bold text-red-800 mb-6">⚠️ Important Warnings</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-red-700 font-medium">Any pressure for admission by offers of donation will disqualify the candidate</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-red-700 font-medium">Letters of recommendation or influence of any nature will disqualify the candidate</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-red-700 font-medium">No individual connected with the school is authorized to accept any emoluments for admission</span>
-                  </li>
-                </ul>
-              </Card>
-
-              <Card variant="elevated" className="p-8 bg-blue-50 border-blue-200">
-                <h3 className="text-2xl font-bold text-blue-800 mb-6">✅ Merit-Based Selection</h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-blue-700">Admissions done solely by management based on overall merit</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-blue-700">Age limit for L.K.G. as prescribed by NEP 2020</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <span className="text-blue-700">Date of birth cannot be altered once admitted</span>
-                  </li>
-                </ul>
-              </Card>
-            </div>
+            )}
           </div>
         </section>
       )}
 
-      {/* FAQ */}
+      {/* FAQ - Dynamic from Backend */}
       {activeTab === 'faq' && (
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-6">
+                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
                 Frequently Asked Questions
               </h2>
@@ -633,47 +1031,127 @@ export default function Admissions() {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card variant="elevated">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">When does the admission process begin?</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  The admission process begins in the first week of January every year. Applications are primarily accepted for L.K.G. class, with higher class admissions only if vacancies are available.
-                </p>
+            {admissionFaqs.length > 0 ? (
+              <div className="max-w-6xl mx-auto">
+                {/* Grid Template (Default) */}
+                {faqsTemplate === 'grid' && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {[...admissionFaqs].sort((a, b) => a.order - b.order).map((faq, index) => (
+                      <Card key={index} variant="elevated" className="bg-white hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0">
+                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                              <span className="text-white font-bold text-sm">Q{index + 1}</span>
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-900 mb-3">
+                              {faq.question}
+                            </h3>
+                            <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        </div>
               </Card>
-              
-              <Card variant="elevated">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">What is the age requirement for L.K.G.?</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  The age limit for L.K.G. admission is as prescribed by the NEP 2020 (New Education Policy). Please contact us for specific age requirements for the current academic year.
-                </p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Accordion Template */}
+                {faqsTemplate === 'accordion' && (
+                  <div className="max-w-4xl mx-auto space-y-3">
+                    {[...admissionFaqs].sort((a, b) => a.order - b.order).map((faq, index) => (
+                      <Card key={index} variant="elevated" className="bg-white overflow-hidden">
+                        <details className="group">
+                          <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-purple-50 transition-colors duration-200">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span className="text-white font-bold text-sm">Q{index + 1}</span>
+                              </div>
+                              <span className="font-bold text-gray-900 text-left">{faq.question}</span>
+                            </div>
+                            <svg className="w-5 h-5 text-gray-500 transition-transform duration-200 group-open:rotate-180 flex-shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </summary>
+                          <div className="px-6 pb-6 pt-2 border-t bg-gray-50">
+                            <p className="text-gray-600 leading-relaxed whitespace-pre-line">{faq.answer}</p>
+                          </div>
+                        </details>
               </Card>
-              
-              <Card variant="elevated">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">What documents are required for Class 2+ admission?</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  For Class 2 or higher, you must provide a School Leaving Certificate, PEN Number, and APAAR ID from your previous institution. The child&apos;s date of birth cannot be altered once admitted.
-                </p>
+                    ))}
+                  </div>
+                )}
+
+                {/* List Template */}
+                {faqsTemplate === 'list' && (
+                  <div className="max-w-4xl mx-auto space-y-6">
+                    {[...admissionFaqs].sort((a, b) => a.order - b.order).map((faq, index) => (
+                      <Card key={index} variant="elevated" className="bg-white hover:shadow-lg transition-all duration-300 border-l-4 border-l-purple-500">
+                        <div className="flex items-start gap-4">
+                          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <span className="text-white font-bold text-sm">Q{index + 1}</span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-900 mb-3">
+                              {faq.question}
+                            </h3>
+                            <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        </div>
               </Card>
-              
-              <Card variant="elevated">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Can I apply for mid-session admission?</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  No, admission is taken only at the beginning of the academic session. There is no admission between academic sessions or after the admission process is officially closed.
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Card variant="elevated" className="p-12 text-center bg-gray-50 max-w-3xl mx-auto">
+                <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  FAQs Coming Soon
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Frequently asked questions will be available here. For now, please contact our admissions office.
                 </p>
+                <Button variant="outline" size="lg">
+                  Contact Admissions Office
+                </Button>
               </Card>
-              
-              <Card variant="elevated">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Is St. Joseph&apos;s a minority institution?</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Yes, St. Joseph&apos;s Catholic School is a minority institution with the constitutional right to admit students according to our policy, as upheld by the Supreme Court of India.
+            )}
+            
+            <div className="mt-12 text-center">
+              <Card variant="elevated" className="p-6 bg-purple-50 border border-purple-200 max-w-3xl mx-auto">
+                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                  Still Have Questions?
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Can&apos;t find the answer you&apos;re looking for? Our admissions team is here to help!
                 </p>
-              </Card>
-              
-              <Card variant="elevated">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">How are admissions decided?</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Admissions are done solely by the management based on the overall merit of the applicant. Any pressure through donations, recommendations, or influence will automatically disqualify the candidate.
-                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  {admissionContact.phone && (
+                    <Button variant="outline" size="lg" className="group hover:bg-purple-50 hover:border-purple-200 hover:text-purple-600 transition-all duration-200">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      Call: {admissionContact.phone}
+                    </Button>
+                  )}
+                  {admissionContact.email && (
+                    <Button variant="outline" size="lg" className="group hover:bg-purple-50 hover:border-purple-200 hover:text-purple-600 transition-all duration-200">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      Email: {admissionContact.email}
+                    </Button>
+                  )}
+                </div>
               </Card>
             </div>
           </div>

@@ -17,7 +17,7 @@ export default function FacilitiesPage() {
             {facilities.map((f) => (
               <Card key={f.id} variant="elevated">
                 <div className="h-48 rounded-xl overflow-hidden mb-4">
-                  {f.image && <Image src={f.image} alt={f.name} className="w-full h-full object-cover" />}
+                  {f.image && <Image src={f.image} alt={f.name} width={400} height={400} className="w-full h-full object-cover" />}
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-gray-900">{f.name}</h3>
                 <p className="text-gray-600 mb-4">{f.description}</p>

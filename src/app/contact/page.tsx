@@ -5,18 +5,13 @@ import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { 
-  schoolApi, 
-  contactApi
-} from '../../services/api';
-import { 
-  SchoolInfo, 
-  ContactInfo
-} from '../../types/school';
+import schoolProfileService from '../../services/schoolProfileService';
+import { APP_CONFIG } from '../../config/app';
+import { SchoolProfile } from '../../types/school';
 
 export default function Contact() {
-  const [schoolInfo, setSchoolInfo] = React.useState<SchoolInfo | null>(null);
-  const [contactInfo, setContactInfo] = React.useState<ContactInfo | null>(null);
+  const [schoolProfile, setSchoolProfile] = React.useState<SchoolProfile | null>(null);
+  const [loading, setLoading] = React.useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,15 +25,13 @@ export default function Contact() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const [school, contact] = await Promise.all([
-          schoolApi.getSchoolInfo(),
-          contactApi.getContactInfo()
-        ]);
-
-        setSchoolInfo(school);
-        setContactInfo(contact);
+        setLoading(true);
+        const profile = await schoolProfileService.getSchoolProfileById(APP_CONFIG.school.id);
+        setSchoolProfile(profile);
+        setLoading(false);
       } catch (error) {
         console.error('Failed to fetch data:', error);
+        setLoading(false);
       }
     };
 
@@ -59,19 +52,17 @@ export default function Contact() {
     setSubmitStatus('idle');
 
     try {
-      const response = await contactApi.sendContactForm(formData);
-      if (response.success) {
-        setSubmitStatus('success');
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: ''
-        });
-      } else {
-        setSubmitStatus('error');
-      }
+      // TODO: Implement contact form submission to backend
+      // For now, just simulate success
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSubmitStatus('success');
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: ''
+      });
     } catch (error) {
       console.error('Failed to send message:', error);
       setSubmitStatus('error');
@@ -79,6 +70,26 @@ export default function Contact() {
       setIsSubmitting(false);
     }
   };
+
+  // Get contact info from school profile
+  const address = schoolProfile?.address
+    ? `${schoolProfile.address.street}, ${schoolProfile.address.city}, ${schoolProfile.address.state} ${schoolProfile.address.zipCode}`
+    : null;
+  const phone = schoolProfile?.contactPhone;
+  const email = schoolProfile?.contactEmail;
+  const admissionEmail = schoolProfile?.profile?.admissionInfo?.contactEmail || email;
+  const socialMedia = schoolProfile?.profile?.socialMedia;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading contact information...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -122,7 +133,7 @@ export default function Contact() {
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900">Address</h3>
               <p className="text-gray-600 text-sm">
-                {schoolInfo?.address || contactInfo?.address || '123 Education Street, Knowledge City, KC 12345'}
+                {address || 'Address not available'}
               </p>
             </Card>
             
@@ -134,7 +145,7 @@ export default function Contact() {
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900">Phone</h3>
               <p className="text-gray-600 text-sm">
-                {schoolInfo?.phone || contactInfo?.phone || '+1 (555) 123-4567'}
+                {phone || 'Phone not available'}
               </p>
             </Card>
             
@@ -146,7 +157,7 @@ export default function Contact() {
               </div>
               <h3 className="text-lg font-bold mb-2 text-gray-900">Email</h3>
               <p className="text-gray-600 text-sm">
-                {schoolInfo?.email || contactInfo?.email || 'info@brightfutureacademy.edu'}
+                {email || 'Email not available'}
               </p>
             </Card>
             
@@ -317,12 +328,14 @@ export default function Contact() {
                   <p className="text-gray-600 mb-4">
                     For questions about admissions, enrollment, and application procedures, our admissions team is here to help.
                   </p>
-                  <div className="flex items-center text-blue-600 hover:text-blue-700 transition-colors">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-sm font-medium">admissions@brightfutureacademy.edu</span>
-                  </div>
+                  {admissionEmail && (
+                    <div className="flex items-center text-blue-600 hover:text-blue-700 transition-colors">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-sm font-medium">{admissionEmail}</span>
+                    </div>
+                  )}
                 </Card>
 
                 <Card variant="elevated" className="p-6">
@@ -340,12 +353,14 @@ export default function Contact() {
                   <p className="text-gray-600 mb-4">
                     For urgent matters outside of office hours, please use our emergency contact number.
                   </p>
-                  <div className="flex items-center text-red-600">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    <span className="text-sm font-medium">+1 (555) 123-4568</span>
-                  </div>
+                  {phone && (
+                    <div className="flex items-center text-red-600">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <span className="text-sm font-medium">{phone}</span>
+                    </div>
+                  )}
                 </Card>
               </div>
             </div>

@@ -13,17 +13,21 @@ import {
 } from '../../types/school';
 import Image from 'next/image';
 export default function Events() {
-  // Removed unused schoolInfo state
   const [events, setEvents] = React.useState<Event[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const eventsData = await eventsApi.getUpcomingEvents();
+        console.log('Fetched events:', eventsData); // Debug log
         setEvents(eventsData);
+        setLoading(false);
       } catch (error) {
         console.error('Failed to fetch data:', error);
+        setLoading(false);
       }
     };
 
@@ -48,7 +52,7 @@ export default function Events() {
   const groupEventsByMonth = (events: Event[]) => {
     const grouped: { [key: string]: Event[] } = {};
     events.forEach(event => {
-      const date = new Date(event.date);
+      const date = new Date(event.startDate);
       const monthYear = date.toLocaleDateString('en-US', { 
         month: 'long', 
         year: 'numeric' 
@@ -62,6 +66,27 @@ export default function Events() {
   };
 
   const groupedEvents = groupEventsByMonth(filteredEvents);
+  
+  // Helper function to get image URL
+  const getEventImage = (event: Event) => event.imageUrl || event.image;
+  
+  // Helper function to format time from date
+  const formatTime = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return `${start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} - ${end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading events...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -97,11 +122,11 @@ export default function Events() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {events.slice(0, 3).map((event) => (
-              <Card key={event.id} variant="elevated" className="group hover:scale-105 transition-all duration-500 overflow-hidden">
+              <Card key={event._id || event.id} variant="elevated" className="group hover:scale-105 transition-all duration-500 overflow-hidden">
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-xl overflow-hidden">
-                  {event.image ? (
+                  {getEventImage(event) ? (
                     <Image
-                      src={event.image}
+                      src={getEventImage(event)!}
                       alt={event.title}
                       width={500}
                       height={500}
@@ -127,7 +152,7 @@ export default function Events() {
                       {event.category}
                     </span>
                     <span className="text-sm text-gray-500">
-                      {new Date(event.date).toLocaleDateString('en-US', { 
+                      {new Date(event.startDate).toLocaleDateString('en-US', { 
                         month: 'short', 
                         day: 'numeric' 
                       })}
@@ -141,7 +166,7 @@ export default function Events() {
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    {event.time}
+                    {event.time || formatTime(event.startDate, event.endDate)}
                   </div>
                   
                   <div className="flex items-center text-sm text-gray-500 mb-6">
@@ -213,12 +238,14 @@ export default function Events() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {monthEvents.map((event) => (
-                      <Card key={event.id} variant="elevated" className="group hover:scale-105 transition-all duration-500 overflow-hidden">
+                      <Card key={event._id || event.id} variant="elevated" className="group hover:scale-105 transition-all duration-500 overflow-hidden">
                         <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-xl overflow-hidden">
-                          {event.image ? (
+                          {getEventImage(event) ? (
                             <Image
-                              src={event.image}
+                              src={getEventImage(event)!}
                               alt={event.title}
+                              width={500}
+                              height={500}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                           ) : (
@@ -241,7 +268,7 @@ export default function Events() {
                               {event.category}
                             </span>
                             <span className="text-sm text-gray-500">
-                              {new Date(event.date).toLocaleDateString('en-US', { 
+                              {new Date(event.startDate).toLocaleDateString('en-US', { 
                                 month: 'short', 
                                 day: 'numeric' 
                               })}
@@ -255,7 +282,7 @@ export default function Events() {
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            {event.time}
+                            {event.time || formatTime(event.startDate, event.endDate)}
                           </div>
                           
                           <div className="flex items-center text-xs text-gray-500 mb-4">

@@ -16,7 +16,7 @@ import {
 
 // Configuration for API endpoints
 const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api',
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api',
   useMockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || true, // Default to mock data
 };
 
@@ -179,19 +179,97 @@ export const newsApi = {
 // Events API
 export const eventsApi = {
   getEvents: async (): Promise<Event[]> => {
-    if (API_CONFIG.useMockData) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+      const response = await fetch(`${baseUrl}/public/school/${schoolId}/events`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch events from backend, using mock data');
+        return mockEvents;
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Map backend event format to frontend format
+        return data.data.map((evt: any) => ({
+          id: evt._id,
+          _id: evt._id,
+          title: evt.title,
+          description: evt.description,
+          startDate: evt.startDate,
+          endDate: evt.endDate,
+          date: new Date(evt.startDate).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          }),
+          time: new Date(evt.startDate).toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          }),
+          location: evt.location || 'School Campus',
+          category: evt.category || 'general',
+          imageUrl: evt.imageUrl,
+          image: evt.imageUrl,
+          isPublic: evt.isPublic,
+          registrationRequired: evt.registrationRequired,
+          maxParticipants: evt.maxParticipants,
+        }));
+      }
+      
+      return mockEvents;
+    } catch (error) {
+      console.error('Error fetching events:', error);
       return mockEvents;
     }
-    return apiCall<Event[]>('/events');
   },
 
   getUpcomingEvents: async (): Promise<Event[]> => {
-    if (API_CONFIG.useMockData) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+      const response = await fetch(`${baseUrl}/public/school/${schoolId}/events`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch upcoming events from backend, using mock data');
+        return mockEvents.filter(event => event.isUpcoming);
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Map backend event format to frontend format
+        return data.data.map((evt: any) => ({
+          id: evt._id,
+          _id: evt._id,
+          title: evt.title,
+          description: evt.description,
+          startDate: evt.startDate,
+          endDate: evt.endDate,
+          date: new Date(evt.startDate).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          }),
+          time: new Date(evt.startDate).toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          }),
+          location: evt.location || 'School Campus',
+          category: evt.category || 'general',
+          imageUrl: evt.imageUrl,
+          image: evt.imageUrl,
+          isPublic: evt.isPublic,
+          registrationRequired: evt.registrationRequired,
+          maxParticipants: evt.maxParticipants,
+        }));
+      }
+      
+      return mockEvents.filter(event => event.isUpcoming);
+    } catch (error) {
+      console.error('Error fetching upcoming events:', error);
       return mockEvents.filter(event => event.isUpcoming);
     }
-    return apiCall<Event[]>('/events/upcoming');
   }
 };
 

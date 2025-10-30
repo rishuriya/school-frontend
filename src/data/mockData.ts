@@ -287,7 +287,8 @@ export const mockSchoolInfo: SchoolInfo = {
   website: "www.stjosephcatholic.edu",
   established: 2015,
   city: "Kochas",
-  logo: "/Kochas%20Logo.JPG"
+  logo: "/Kochas%20Logo.JPG",
+  id: "1"
 };
 
 export const mockNews: NewsItem[] = [

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { schoolApi } from '../../services/api';
+import schoolProfileService from '../../services/schoolProfileService';
+import { APP_CONFIG } from '../../config/app';
 import { SchoolInfo } from '../../types/school';
 import Image from 'next/image';
 
@@ -19,10 +20,35 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
   React.useEffect(() => {
     const fetchSchoolInfo = async () => {
       try {
-        const info = await schoolApi.getSchoolInfo();
-        setSchoolInfo(info);
+        // Fetch from backend using school ID
+        const profile = await schoolProfileService.getSchoolProfileById(APP_CONFIG.school.id);
+        const mappedSchoolInfo: SchoolInfo = {
+          id: profile._id || '',
+          name: profile.name,
+          tagline: profile.profile?.vision?.substring(0, 100) || 'Excellence in Education',
+          description: profile.profile?.mission || '',
+          address: `${profile.address?.street || ''}, ${profile.address?.city || ''}, ${profile.address?.state || ''} ${profile.address?.zipCode || ''}`.trim(),
+          city: profile.address?.city || '',
+          phone: profile.contactInfo?.phone || '',
+          email: profile.contactInfo?.email || '',
+          logo: profile.logoUrl,
+          established: profile.profile?.established ? new Date(profile.profile.established).getFullYear() : 2000,
+        };
+        setSchoolInfo(mappedSchoolInfo);
       } catch (error) {
         console.error('Failed to fetch school info:', error);
+        // Set fallback data
+        setSchoolInfo({
+          id: '',
+          name: 'School Name',
+          tagline: 'Excellence in Education',
+          description: '',
+          address: '',
+          city: '',
+          phone: '',
+          email: '',
+          established: 2000,
+        });
       }
     };
     fetchSchoolInfo();
@@ -112,7 +138,13 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
             <Link href="/" className="flex items-center space-x-4 group">
               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden transition-all duration-300 group-hover:scale-110 ${overlay ? 'bg-white/20 backdrop-blur-sm border border-white/30' : 'bg-gradient-to-br from-blue-600 to-purple-600 shadow-blue-500/25'}`}>
                 {schoolInfo?.logo ? (
-                  <Image src={schoolInfo.logo} alt="School logo" className="w-full h-full object-cover rounded-2xl" />
+                  <Image 
+                    src={schoolInfo.logo} 
+                    alt="School logo" 
+                    width={48} 
+                    height={48}
+                    className="w-full h-full object-cover rounded-2xl" 
+                  />
                 ) : (
                   <span className={`${overlay ? 'text-white' : 'text-white'} font-bold text-xl`}>
                     {schoolInfo?.name?.charAt(0) || 'S'}

@@ -9,6 +9,7 @@ export interface SchoolInfo {
   established: number;
   logo?: string;
   city?: string;
+  id: string;
 }
 
 export interface Leadership {
@@ -79,17 +80,26 @@ export interface NewsItem {
 
 export interface Event {
   id: string;
+  _id?: string;
+  schoolId?: string;
   title: string;
   description: string;
-  date: string;
-  time: string;
+  startDate: string;
+  endDate: string;
+  date?: string; // For backward compatibility
+  time?: string; // For backward compatibility
   location: string;
-  image?: string;
-  isUpcoming: boolean;
-  category: 'academic' | 'cultural' | 'sports' | 'community';
+  category: 'academic' | 'cultural' | 'sports' | 'community' | 'social' | 'religious' | 'other';
+  imageUrl?: string;
+  image?: string; // For backward compatibility
+  isPublic?: boolean;
+  isUpcoming?: boolean;
+  registrationRequired?: boolean;
+  maxParticipants?: number;
   organizer?: string;
   targetAudience?: string;
-  registrationRequired?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Faculty {
@@ -107,8 +117,12 @@ export interface Student {
   id: string;
   name: string;
   grade: string;
+  class?: string;
+  section?: string;
+  achievement?: string;
   achievements: string[];
   image?: string;
+  description?: string;
 }
 
 export interface Program {
@@ -167,4 +181,171 @@ export interface AttendancePolicy {
     amount?: string;
     consequence: string;
   }[];
+}
+
+// School Profile Types
+export interface SchoolProfile {
+  _id: string;
+  name: string;
+  subdomain: string;
+  logoUrl?: string;
+  brandColor: string;
+  contactEmail: string;
+  contactPhone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  settings: {
+    allowOnlineAdmissions: boolean;
+    showEvents: boolean;
+    showGallery: boolean;
+    showStaff: boolean;
+  };
+  profile?: {
+    mission?: string;
+    vision?: string;
+    goals?: {
+      text: string;
+      icon?: string;
+      order: number;
+    }[];
+    coreValues?: {
+      title: string;
+      description: string;
+      icon?: string;
+      emoji?: string;
+      order: number;
+      show: boolean;
+    }[];
+    established?: string;
+    principalMessage?: string;
+    principalImage?: string;
+    headerImage?: string;
+    aboutImage?: string;
+    aboutCards?: {
+      title: string;
+      content: string;
+      image?: string;
+      imageUrl?: string;
+      showImage: boolean;
+      show: boolean;
+      order: number;
+      icon?: string;
+    }[];
+    rules?: {
+      admission?: string[];
+      parent?: string[];
+      uniform?: string[];
+      student?: string[];
+      attendance?: string[];
+      discipline?: string[];
+    };
+    admissionInfo?: {
+      isOpen: boolean;
+      startDate?: string;
+      endDate?: string;
+      requirements?: string[];
+      process?: string[];
+      fees?: {
+        category: string;
+        amount: string;
+        description?: string;
+        order: number;
+      }[];
+      contactNumber?: string;
+      contactEmail?: string;
+      policy?: string[];
+      importantDates?: {
+        title: string;
+        date: string;
+        description?: string;
+        order: number;
+      }[];
+      faqs?: {
+        question: string;
+        answer: string;
+        order: number;
+      }[];
+    };
+    facilities?: {
+      name: string;
+      description: string;
+      icon?: string;
+      image?: string;
+    }[];
+    achievements?: {
+      title: string;
+      description: string;
+      year: number;
+      image?: string;
+    }[];
+    socialMedia?: {
+      facebook?: string;
+      twitter?: string;
+      instagram?: string;
+      linkedin?: string;
+      youtube?: string;
+    };
+    layout?: {
+      globalTheme?: {
+        primaryColor?: string;
+        secondaryColor?: string;
+        accentColor?: string;
+        fontFamily?: string;
+      };
+      sections?: {
+        mission?: {
+          show: boolean;
+          template: 'card' | 'banner' | 'split' | 'minimal';
+          order: number;
+        };
+        vision?: {
+          show: boolean;
+          template: 'card' | 'banner' | 'split' | 'minimal';
+          order: number;
+        };
+        goals?: {
+          show: boolean;
+          template: 'grid' | 'list' | 'timeline' | 'cards';
+          order: number;
+        };
+        facilities?: {
+          show: boolean;
+          template: 'grid' | 'carousel' | 'masonry' | 'list';
+          order: number;
+        };
+        achievements?: {
+          show: boolean;
+          template: 'timeline' | 'grid' | 'list' | 'showcase';
+          order: number;
+        };
+        principalMessage?: {
+          show: boolean;
+          template: 'centered' | 'side-by-side' | 'overlay' | 'quote';
+          order: number;
+        };
+        rules?: {
+          show: boolean;
+          template: 'tabs' | 'accordion' | 'grid' | 'list';
+          order: number;
+        };
+        admission?: {
+          show: boolean;
+          template: 'banner' | 'card' | 'detailed' | 'cta';
+          order: number;
+        };
+        aboutCards?: {
+          show: boolean;
+          template: 'story' | 'grid' | 'masonry' | 'timeline';
+          order: number;
+        };
+      };
+    };
+  };
+  createdAt?: string;
+  updatedAt?: string;
 } 

@@ -12,29 +12,57 @@ interface LeadershipProps {
 const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
   const [activeTab, setActiveTab] = useState(0);
 
-  const positionColors = {
-    Principal: 'from-blue-500 to-purple-600',
-    Director: 'from-green-500 to-teal-600',
-    Chairman: 'from-purple-500 to-pink-600'
+  // Dynamic position colors based on index
+  const getPositionColor = (index: number) => {
+    const colors = [
+      'from-blue-500 to-purple-600',
+      'from-green-500 to-teal-600',
+      'from-purple-500 to-pink-600',
+      'from-orange-500 to-red-600',
+      'from-indigo-500 to-blue-600',
+      'from-pink-500 to-rose-600',
+    ];
+    return colors[index % colors.length];
   };
 
-  const positionIcons = {
-    Principal: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-    ),
-    Director: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-      </svg>
-    ),
-    Chairman: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-    )
+  // Dynamic position icon
+  const getPositionIcon = (position: string) => {
+    // Check if position contains certain keywords
+    const pos = position.toLowerCase();
+    
+    if (pos.includes('principal') || pos.includes('head')) {
+      return (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      );
+    } else if (pos.includes('director') || pos.includes('admin')) {
+      return (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      );
+    } else if (pos.includes('teacher')) {
+      return (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+        </svg>
+      );
+    } else {
+      // Default icon for any other position
+      return (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      );
+    }
   };
+
+  if (!leaders || leaders.length === 0) {
+    return null; // Don't show section if no leaders
+  }
 
   return (
     <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
@@ -42,10 +70,10 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Leadership Speaks
+            Leadership & Faculty Speaks
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-            Hear from our visionary leaders who are shaping the future of education and inspiring the next generation of learners.
+            Hear from our dedicated educators and leaders who are committed to shaping the future of our students.
           </p>
         </div>
 
@@ -57,14 +85,14 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
               onClick={() => setActiveTab(index)}
               className={`flex items-center space-x-3 px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                 activeTab === index
-                  ? `bg-gradient-to-r ${positionColors[leader.position]} text-white shadow-lg`
+                  ? `bg-gradient-to-r ${getPositionColor(index)} text-white shadow-lg`
                   : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
               }`}
             >
               <div className={`p-2 rounded-full ${
                 activeTab === index ? 'bg-white/20' : 'bg-gray-100'
               }`}>
-                {positionIcons[leader.position]}
+                {getPositionIcon(leader.position)}
               </div>
               <span>{leader.position}</span>
             </button>
@@ -89,55 +117,65 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
                   <Image
                     src={leader.image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'}
                     alt={leader.name}
+                    width={400}
+                    height={256}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className={`absolute -bottom-4 left-6 w-16 h-16 bg-gradient-to-r ${positionColors[leader.position]} rounded-full flex items-center justify-center shadow-lg`}>
-                  {positionIcons[leader.position]}
+                <div className={`absolute -bottom-4 left-6 w-16 h-16 bg-gradient-to-r ${getPositionColor(index)} rounded-full flex items-center justify-center shadow-lg text-white`}>
+                  {getPositionIcon(leader.position)}
                 </div>
               </div>
 
               {/* Leader Info */}
               <div className="pl-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{leader.name}</h3>
-                <p className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r ${positionColors[leader.position]} text-white mb-3`}>
+                <p className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r ${getPositionColor(index)} text-white mb-3`}>
                   {leader.position}
                 </p>
-                <p className="text-gray-600 mb-4">{leader.experience}</p>
+                {leader.experience && (
+                  <p className="text-gray-600 mb-4">{leader.experience}</p>
+                )}
 
                 {/* Message */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-3">Message</h4>
-                  <p className="text-gray-600 leading-relaxed italic">
-                    &ldquo;{leader.message}&rdquo;
-                  </p>
-                </div>
+                {leader.message && (
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-3">Message</h4>
+                    <p className="text-gray-600 leading-relaxed italic">
+                      &ldquo;{leader.message}&rdquo;
+                    </p>
+                  </div>
+                )}
 
                 {/* Achievements */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-3">Key Achievements</h4>
-                  <ul className="space-y-2">
-                    {leader.achievements.slice(0, 2).map((achievement, idx) => (
-                      <li key={idx} className="flex items-start space-x-2">
-                        <div className={`w-2 h-2 bg-gradient-to-r ${positionColors[leader.position]} rounded-full mt-2 flex-shrink-0`}></div>
-                        <span className="text-sm text-gray-600">{achievement}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {leader.achievements && leader.achievements.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-3">Key Achievements</h4>
+                    <ul className="space-y-2">
+                      {leader.achievements.slice(0, 3).map((achievement, idx) => (
+                        <li key={idx} className="flex items-start space-x-2">
+                          <div className={`w-2 h-2 bg-gradient-to-r ${getPositionColor(index)} rounded-full mt-2 flex-shrink-0`}></div>
+                          <span className="text-sm text-gray-600">{achievement}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 {/* Contact */}
                 <div className="border-t border-gray-200 pt-4">
                   <div className="flex items-center space-x-4">
-                    <a
-                      href={`mailto:${leader.email}`}
-                      className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <span className="text-sm">Email</span>
-                    </a>
+                    {leader.email && (
+                      <a
+                        href={`mailto:${leader.email}`}
+                        className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span className="text-sm">Email</span>
+                      </a>
+                    )}
                     {leader.phone && (
                       <a
                         href={`tel:${leader.phone}`}
@@ -159,7 +197,7 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
         {/* View All Button */}
         <div className="text-center mt-12">
           <Button variant="gradient" size="lg">
-            Meet Our Full Leadership Team
+            Meet Our Full Faculty Team
           </Button>
         </div>
       </div>

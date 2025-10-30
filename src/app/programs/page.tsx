@@ -174,6 +174,8 @@ export default function Programs() {
                     <Image
                       src={program.image}
                       alt={program.name}
+                      width={400}
+                      height={400}
                       className="w-full h-full object-cover"
                     />
                   ) : (
