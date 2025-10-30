@@ -11,6 +11,7 @@ A modern, responsive school website built with Next.js 15, TypeScript, and Tailw
 - **Backend Ready**: Easy switch to real API endpoints
 - **SEO Optimized**: Proper metadata and Open Graph tags
 - **Accessible**: WCAG compliant components
+- **Dynamic by School**: Pages load data dynamically by School ID or subdomain
 
 ## 📁 Project Structure
 
@@ -84,6 +85,9 @@ Create a `.env.local` file in the root directory:
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
 NEXT_PUBLIC_USE_MOCK_DATA=true
 
+# Dynamic school context
+NEXT_PUBLIC_SCHOOL_ID=68c22a22ec3c0fd06634bc93
+
 # Site Configuration
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
@@ -130,6 +134,35 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
    ```
 
 3. **Data Format**: Ensure your backend returns data in the same format as defined in `src/types/school.ts`
+
+## 🏫 Dynamic Pages Driven by School ID
+
+This project is multi-tenant. Pages are dynamic and render content for a specific school. The active school is resolved in two ways:
+
+- Subdomain-based profile: `src/services/schoolProfileService.ts` → `getSchoolProfile(subdomain)`
+- ID-based profile and data: `src/services/schoolProfileService.ts` → `getSchoolProfileById(schoolId)` and API like `eventsApi` use `NEXT_PUBLIC_SCHOOL_ID`
+
+How it works:
+
+- Set `NEXT_PUBLIC_SCHOOL_ID` in `.env.local` to target a specific school on local/dev.
+- When using a custom domain or subdomain per school, the app can fetch the profile by subdomain.
+- Feature pages (e.g., Events, About, Facilities) fetch their data from backend endpoints that are scoped to the active school.
+
+Key places in code:
+
+- `src/services/schoolProfileService.ts`: Loads school profile by ID or subdomain and caches per-identifier.
+- `src/services/api.ts` → `eventsApi`: Fetches events from `/public/school/{schoolId}/events` using `NEXT_PUBLIC_SCHOOL_ID`.
+
+Quick start examples:
+
+```env
+# Use a specific school ID locally
+NEXT_PUBLIC_SCHOOL_ID=68c22a22ec3c0fd06634bc93
+NEXT_PUBLIC_USE_MOCK_DATA=false
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
+```
+
+Then run the dev server and open the site. The Events and other school-scoped pages will render data for the configured School ID. If you deploy with subdomains (e.g., `myschool.example.com`), use `getSchoolProfile(subdomain)` on the server to resolve the active school.
 
 ## 📊 Data Models
 
