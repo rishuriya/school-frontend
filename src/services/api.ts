@@ -17,7 +17,7 @@ import {
 // Configuration for API endpoints
 const API_CONFIG = {
   baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api',
-  useMockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || true, // Default to mock data
+  useMockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || false, // Default to mock data
 };
 
 // Generic API call function
@@ -75,7 +75,7 @@ export const aboutApi = {
   getAboutContentBySection: async (section: string): Promise<AboutContent[]> => {
     if (API_CONFIG.useMockData) {
       await new Promise(resolve => setTimeout(resolve, 100));
-      return aboutContent.filter(content => content.section === section);
+      return aboutContent.filter((content: AboutContent) => content.section === section);
     }
     return apiCall<AboutContent[]>(`/about/content/section/${section}`);
   },
@@ -192,7 +192,20 @@ export const eventsApi = {
       const data = await response.json();
       if (data.success && data.data) {
         // Map backend event format to frontend format
-        return data.data.map((evt: any) => ({
+        interface BackendEvent {
+          _id: string;
+          title: string;
+          description: string;
+          startDate: string;
+          endDate?: string;
+          location?: string;
+          category?: string;
+          imageUrl?: string;
+          isPublic?: boolean;
+          registrationRequired?: boolean;
+          maxParticipants?: number;
+        }
+        return data.data.map((evt: BackendEvent) => ({
           id: evt._id,
           _id: evt._id,
           title: evt.title,
@@ -239,7 +252,20 @@ export const eventsApi = {
       const data = await response.json();
       if (data.success && data.data) {
         // Map backend event format to frontend format
-        return data.data.map((evt: any) => ({
+        interface BackendEvent {
+          _id: string;
+          title: string;
+          description: string;
+          startDate: string;
+          endDate?: string;
+          location?: string;
+          category?: string;
+          imageUrl?: string;
+          isPublic?: boolean;
+          registrationRequired?: boolean;
+          maxParticipants?: number;
+        }
+        return data.data.map((evt: BackendEvent) => ({
           id: evt._id,
           _id: evt._id,
           title: evt.title,

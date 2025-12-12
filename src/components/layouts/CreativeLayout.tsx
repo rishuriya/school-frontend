@@ -10,7 +10,7 @@ interface CreativeLayoutProps {
 
 export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
   const sections = profile.profile?.layout?.sections;
-  const theme = profile.profile?.layout?.theme;
+  const theme = profile.profile?.layout?.globalTheme;
   const primaryColor = theme?.primaryColor || profile.brandColor;
   const secondaryColor = theme?.secondaryColor || '#8B5CF6';
   const accentColor = theme?.accentColor || '#EC4899';
@@ -42,7 +42,7 @@ export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
       <div className="container mx-auto px-4 py-12">
         {/* Mission & Vision in Creative Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {sections?.showMission && profile.profile?.mission && (
+          {sections?.mission?.show !== false && profile.profile?.mission && (
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
               <div className="relative bg-white rounded-2xl p-8 shadow-xl">
@@ -59,7 +59,7 @@ export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
             </div>
           )}
 
-          {sections?.showVision && profile.profile?.vision && (
+          {sections?.vision?.show !== false && profile.profile?.vision && (
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
               <div className="relative bg-white rounded-2xl p-8 shadow-xl">
@@ -78,7 +78,7 @@ export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
         </div>
 
         {/* Goals in Creative Grid */}
-        {sections?.showGoals && profile.profile?.goals && profile.profile.goals.length > 0 && (
+        {sections?.goals?.show !== false && profile.profile?.goals && profile.profile.goals.length > 0 && (
           <section className="mb-16">
             <h2 className="text-5xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               What Drives Us
@@ -105,7 +105,7 @@ export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
                       <div className={`text-4xl font-bold mb-4 bg-gradient-to-r ${colorClass} bg-clip-text text-transparent`}>
                         {String(index + 1).padStart(2, '0')}
                       </div>
-                      <p className="text-gray-700">{goal}</p>
+                      <p className="text-gray-700">{typeof goal === 'string' ? goal : (goal.title || goal.text || goal.description || 'Goal')}</p>
                     </div>
                   </div>
                 );
@@ -115,7 +115,7 @@ export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
         )}
 
         {/* Principal's Message Creative Card */}
-        {sections?.showPrincipalMessage && profile.profile?.principalMessage && (
+        {sections?.principalMessage?.show !== false && profile.profile?.principalMessage && (
           <section className="mb-16">
             <div className="relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 rounded-3xl blur-lg opacity-30"></div>
@@ -144,7 +144,7 @@ export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
         )}
 
         {/* Facilities in Creative Grid */}
-        {sections?.showFacilities && profile.profile?.facilities && profile.profile.facilities.length > 0 && (
+        {sections?.facilities?.show !== false && profile.profile?.facilities && profile.profile.facilities.length > 0 && (
           <section className="mb-16">
             <h2 className="text-5xl font-bold text-center mb-12 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               World-Class Facilities
@@ -175,7 +175,7 @@ export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
         )}
 
         {/* Achievements Creative Timeline */}
-        {sections?.showAchievements && profile.profile?.achievements && profile.profile.achievements.length > 0 && (
+        {sections?.achievements?.show !== false && profile.profile?.achievements && profile.profile.achievements.length > 0 && (
           <section className="mb-16">
             <h2 className="text-5xl font-bold text-center mb-12 bg-gradient-to-r from-yellow-600 to-red-600 bg-clip-text text-transparent">
               Our Proud Moments
@@ -202,7 +202,7 @@ export const CreativeLayout: React.FC<CreativeLayoutProps> = ({ profile }) => {
         )}
 
         {/* Admission CTA */}
-        {sections?.showAdmission && profile.profile?.admissionInfo?.isOpen && (
+        {sections?.admission?.show !== false && profile.profile?.admissionInfo?.isOpen && (
           <section className="mb-16">
             <div className="relative overflow-hidden rounded-3xl">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600"></div>

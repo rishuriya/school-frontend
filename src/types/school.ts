@@ -208,8 +208,11 @@ export interface SchoolProfile {
   profile?: {
     mission?: string;
     vision?: string;
+    
     goals?: {
-      text: string;
+      text?: string; // Legacy support
+      title?: string; // New format
+      description?: string;
       icon?: string;
       order: number;
     }[];
@@ -248,7 +251,13 @@ export interface SchoolProfile {
       isOpen: boolean;
       startDate?: string;
       endDate?: string;
-      requirements?: string[];
+      requirements?: string[]; // Legacy format
+      requirementSections?: { // New sectioned format
+        id: string;
+        title: string;
+        order: number;
+        requirements: string[];
+      }[];
       process?: string[];
       fees?: {
         category: string;
@@ -346,6 +355,7 @@ export interface SchoolProfile {
       };
     };
   };
+  moto?: string;
   createdAt?: string;
   updatedAt?: string;
 } 

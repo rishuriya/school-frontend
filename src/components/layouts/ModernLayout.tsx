@@ -10,7 +10,7 @@ interface ModernLayoutProps {
 
 export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
   const sections = profile.profile?.layout?.sections;
-  const theme = profile.profile?.layout?.theme;
+  const theme = profile.profile?.layout?.globalTheme;
 
   const primaryColor = theme?.primaryColor || profile.brandColor;
   const secondaryColor = theme?.secondaryColor || '#4F46E5';
@@ -45,7 +45,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
 
       <div className="container mx-auto px-4 py-12">
         {/* Mission & Vision */}
-        {sections?.showMission && profile.profile?.mission && (
+        {sections?.mission?.show !== false && profile.profile?.mission && (
           <section className="mb-16">
             <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border-l-4" style={{ borderColor: primaryColor }}>
               <h2 className="text-3xl font-bold mb-6" style={{ color: primaryColor }}>
@@ -58,7 +58,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
           </section>
         )}
 
-        {sections?.showVision && profile.profile?.vision && (
+        {sections?.vision?.show !== false && profile.profile?.vision && (
           <section className="mb-16">
             <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 border-l-4" style={{ borderColor: secondaryColor }}>
               <h2 className="text-3xl font-bold mb-6" style={{ color: secondaryColor }}>
@@ -72,7 +72,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
         )}
 
         {/* Goals */}
-        {sections?.showGoals && profile.profile?.goals && profile.profile.goals.length > 0 && (
+        {sections?.goals?.show !== false && profile.profile?.goals && profile.profile.goals.length > 0 && (
           <section className="mb-16">
             <h2 className="text-4xl font-bold text-center mb-12" style={{ color: primaryColor }}>
               Our Goals
@@ -89,7 +89,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
                   >
                     <span className="text-2xl font-bold">{index + 1}</span>
                   </div>
-                  <p className="text-gray-700 leading-relaxed">{goal}</p>
+                  <p className="text-gray-700 leading-relaxed">{typeof goal === 'string' ? goal : (goal.title || goal.text || goal.description || 'Goal')}</p>
                 </div>
               ))}
             </div>
@@ -97,7 +97,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
         )}
 
         {/* Principal's Message */}
-        {sections?.showPrincipalMessage && profile.profile?.principalMessage && (
+        {sections?.principalMessage?.show !== false && profile.profile?.principalMessage && (
           <section className="mb-16">
             <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl shadow-lg p-8 md:p-12">
               <h2 className="text-3xl font-bold mb-8 text-center" style={{ color: primaryColor }}>
@@ -125,7 +125,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
         )}
 
         {/* Facilities */}
-        {sections?.showFacilities && profile.profile?.facilities && profile.profile.facilities.length > 0 && (
+        {sections?.facilities?.show !== false && profile.profile?.facilities && profile.profile.facilities.length > 0 && (
           <section className="mb-16">
             <h2 className="text-4xl font-bold text-center mb-12" style={{ color: primaryColor }}>
               Our Facilities
@@ -161,7 +161,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
         )}
 
         {/* Achievements */}
-        {sections?.showAchievements && profile.profile?.achievements && profile.profile.achievements.length > 0 && (
+        {sections?.achievements?.show !== false && profile.profile?.achievements && profile.profile.achievements.length > 0 && (
           <section className="mb-16">
             <h2 className="text-4xl font-bold text-center mb-12" style={{ color: primaryColor }}>
               Our Achievements
@@ -193,7 +193,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ profile }) => {
         )}
 
         {/* Admission Info */}
-        {sections?.showAdmission && profile.profile?.admissionInfo?.isOpen && (
+        {sections?.admission?.show !== false && profile.profile?.admissionInfo?.isOpen && (
           <section className="mb-16">
             <div
               className="rounded-2xl shadow-xl p-8 md:p-12 text-white"

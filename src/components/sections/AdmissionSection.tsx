@@ -16,6 +16,28 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
 
   if (!admissionInfo?.isOpen) return null;
 
+  // Helper function to render requirements (supports both old and new format)
+  const renderRequirements = () => {
+    // Check for new sectioned format first
+    if (admissionInfo.requirementSections && admissionInfo.requirementSections.length > 0) {
+      const sortedSections = [...admissionInfo.requirementSections].sort((a, b) => a.order - b.order);
+      return sortedSections.map((section) => ({
+        title: section.title,
+        requirements: section.requirements
+      }));
+    }
+    // Fallback to legacy format
+    if (admissionInfo.requirements && admissionInfo.requirements.length > 0) {
+      return [{
+        title: 'General Requirements',
+        requirements: admissionInfo.requirements
+      }];
+    }
+    return null;
+  };
+
+  const requirementSections = renderRequirements();
+
   switch (template) {
     case 'card':
       return (
@@ -28,23 +50,41 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
                 </div>
                 <h2 className="text-4xl font-bold text-gray-900">Join Our Community</h2>
               </div>
-              {admissionInfo.process && (
+              {admissionInfo.process && admissionInfo.process.length > 0 && (
                 <div className="mb-8">
                   <h3 className="text-2xl font-bold mb-4 text-gray-900">Admission Process</h3>
-                  <p className="text-gray-700 leading-relaxed">{admissionInfo.process}</p>
+                  {Array.isArray(admissionInfo.process) ? (
+                    <ol className="space-y-2">
+                      {admissionInfo.process.map((step, index) => (
+                        <li key={index} className="flex items-start text-gray-700">
+                          <span className="font-semibold mr-2 text-green-600">{index + 1}.</span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="text-gray-700 leading-relaxed">{admissionInfo.process}</p>
+                  )}
                 </div>
               )}
-              {admissionInfo.requirements && admissionInfo.requirements.length > 0 && (
+              {requirementSections && requirementSections.length > 0 && (
                 <div>
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900">Requirements</h3>
-                  <ul className="space-y-3">
-                    {admissionInfo.requirements.map((req, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="text-green-600 mr-3">✓</span>
-                        <span className="text-gray-700">{req}</span>
-                      </li>
+                  <h3 className="text-2xl font-bold mb-4 text-gray-900">Admission Requirements</h3>
+                  <div className="space-y-6">
+                    {requirementSections.map((section, sectionIndex) => (
+                      <div key={sectionIndex} className="border-l-4 border-green-500 pl-4">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-3">{section.title}</h4>
+                        <ul className="space-y-2">
+                          {section.requirements.map((req, index) => (
+                            <li key={index} className="flex items-start">
+                              <span className="text-green-600 mr-3">✓</span>
+                              <span className="text-gray-700">{req}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
             </div>
@@ -63,26 +103,44 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {admissionInfo.process && (
+              {admissionInfo.process && admissionInfo.process.length > 0 && (
                 <div className="bg-gray-50 rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-3" style={{ color: primaryColor }}>Process</h3>
-                  <p className="text-gray-700">{admissionInfo.process}</p>
+                  {Array.isArray(admissionInfo.process) ? (
+                    <ol className="space-y-2">
+                      {admissionInfo.process.map((step, index) => (
+                        <li key={index} className="text-gray-700 text-sm">
+                          <span className="font-semibold mr-1">{index + 1}.</span>
+                          {step}
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="text-gray-700">{admissionInfo.process}</p>
+                  )}
                 </div>
               )}
-              {admissionInfo.requirements && (
+              {requirementSections && requirementSections.length > 0 && (
                 <div className="bg-gray-50 rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-3" style={{ color: primaryColor }}>Requirements</h3>
-                  <ul className="space-y-2">
-                    {admissionInfo.requirements.map((req, index) => (
-                      <li key={index} className="text-gray-700 text-sm">✓ {req}</li>
+                  <div className="space-y-4">
+                    {requirementSections.map((section, sectionIndex) => (
+                      <div key={sectionIndex}>
+                        <h4 className="font-semibold text-gray-800 mb-2 text-sm">{section.title}</h4>
+                        <ul className="space-y-1 ml-2">
+                          {section.requirements.map((req, index) => (
+                            <li key={index} className="text-gray-700 text-sm">✓ {req}</li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
               {admissionInfo.fees && (
                 <div className="bg-gray-50 rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-3" style={{ color: primaryColor }}>Fee Structure</h3>
-                  <p className="text-gray-700">{admissionInfo.fees}</p>
+                  <p className="text-gray-700">{admissionInfo.fees.map((fee) => fee.category).join(', ')}</p>
                 </div>
               )}
             </div>
@@ -125,23 +183,41 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {admissionInfo.process && (
+              {admissionInfo.process && admissionInfo.process.length > 0 && (
                 <div>
                   <h3 className="text-2xl font-bold mb-4">Admission Process</h3>
-                  <p className="text-lg opacity-95">{admissionInfo.process}</p>
+                  {Array.isArray(admissionInfo.process) ? (
+                    <ol className="space-y-2">
+                      {admissionInfo.process.map((step, index) => (
+                        <li key={index} className="flex items-start opacity-95">
+                          <span className="font-semibold mr-2">{index + 1}.</span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="text-lg opacity-95">{admissionInfo.process}</p>
+                  )}
                 </div>
               )}
-              {admissionInfo.requirements && admissionInfo.requirements.length > 0 && (
+              {requirementSections && requirementSections.length > 0 && (
                 <div>
-                  <h3 className="text-2xl font-bold mb-4">Requirements</h3>
-                  <ul className="space-y-2">
-                    {admissionInfo.requirements.map((req, index) => (
-                      <li key={index} className="flex items-start opacity-95">
-                        <span className="mr-2">✓</span>
-                        <span>{req}</span>
-                      </li>
+                  <h3 className="text-2xl font-bold mb-4">Admission Requirements</h3>
+                  <div className="space-y-4">
+                    {requirementSections.map((section, sectionIndex) => (
+                      <div key={sectionIndex} className="border-l-4 border-white/30 pl-4">
+                        <h4 className="text-lg font-semibold mb-2 opacity-95">{section.title}</h4>
+                        <ul className="space-y-2">
+                          {section.requirements.map((req, index) => (
+                            <li key={index} className="flex items-start opacity-95">
+                              <span className="mr-2">✓</span>
+                              <span>{req}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
             </div>

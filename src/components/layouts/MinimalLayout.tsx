@@ -10,7 +10,7 @@ interface MinimalLayoutProps {
 
 export const MinimalLayout: React.FC<MinimalLayoutProps> = ({ profile }) => {
   const sections = profile.profile?.layout?.sections;
-  const theme = profile.profile?.layout?.theme;
+  const theme = profile.profile?.layout?.globalTheme;
   const primaryColor = theme?.primaryColor || profile.brandColor;
 
   return (
@@ -26,7 +26,7 @@ export const MinimalLayout: React.FC<MinimalLayoutProps> = ({ profile }) => {
 
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         {/* Mission */}
-        {sections?.showMission && profile.profile?.mission && (
+        {sections?.mission?.show !== false && profile.profile?.mission && (
           <section className="mb-20">
             <h2 className="text-sm uppercase tracking-widest mb-6" style={{ color: `${primaryColor}80` }}>
               Mission
@@ -38,7 +38,7 @@ export const MinimalLayout: React.FC<MinimalLayoutProps> = ({ profile }) => {
         )}
 
         {/* Vision */}
-        {sections?.showVision && profile.profile?.vision && (
+        {sections?.vision?.show !== false && profile.profile?.vision && (
           <section className="mb-20">
             <h2 className="text-sm uppercase tracking-widest mb-6" style={{ color: `${primaryColor}80` }}>
               Vision
@@ -50,26 +50,29 @@ export const MinimalLayout: React.FC<MinimalLayoutProps> = ({ profile }) => {
         )}
 
         {/* Goals */}
-        {sections?.showGoals && profile.profile?.goals && profile.profile.goals.length > 0 && (
+        {sections?.goals?.show !== false && profile.profile?.goals && profile.profile.goals.length > 0 && (
           <section className="mb-20">
             <h2 className="text-sm uppercase tracking-widest mb-6" style={{ color: `${primaryColor}80` }}>
               Goals
             </h2>
             <div className="space-y-8">
-              {profile.profile.goals.map((goal, index) => (
-                <div key={index} className="flex items-start gap-6">
-                  <span className="text-4xl font-light" style={{ color: `${primaryColor}40` }}>
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <p className="text-lg text-gray-700 leading-relaxed flex-1">{goal}</p>
-                </div>
-              ))}
+              {profile.profile.goals.map((goal, index) => {
+                const goalText = typeof goal === 'string' ? goal : (goal.title || goal.text || goal.description || 'Goal');
+                return (
+                  <div key={index} className="flex items-start gap-6">
+                    <span className="text-4xl font-light" style={{ color: `${primaryColor}40` }}>
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <p className="text-lg text-gray-700 leading-relaxed flex-1">{goalText}</p>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
 
         {/* Principal's Message */}
-        {sections?.showPrincipalMessage && profile.profile?.principalMessage && (
+        {sections?.principalMessage?.show !== false && profile.profile?.principalMessage && (
           <section className="mb-20">
             <h2 className="text-sm uppercase tracking-widest mb-6" style={{ color: `${primaryColor}80` }}>
               Principal&apos;s Message
@@ -83,7 +86,7 @@ export const MinimalLayout: React.FC<MinimalLayoutProps> = ({ profile }) => {
         )}
 
         {/* Facilities */}
-        {sections?.showFacilities && profile.profile?.facilities && profile.profile.facilities.length > 0 && (
+        {sections?.facilities?.show !== false && profile.profile?.facilities && profile.profile.facilities.length > 0 && (
           <section className="mb-20">
             <h2 className="text-sm uppercase tracking-widest mb-8" style={{ color: `${primaryColor}80` }}>
               Facilities
@@ -102,7 +105,7 @@ export const MinimalLayout: React.FC<MinimalLayoutProps> = ({ profile }) => {
         )}
 
         {/* Achievements */}
-        {sections?.showAchievements && profile.profile?.achievements && profile.profile.achievements.length > 0 && (
+        {sections?.achievements?.show !== false && profile.profile?.achievements && profile.profile.achievements.length > 0 && (
           <section className="mb-20">
             <h2 className="text-sm uppercase tracking-widest mb-8" style={{ color: `${primaryColor}80` }}>
               Achievements
@@ -124,7 +127,7 @@ export const MinimalLayout: React.FC<MinimalLayoutProps> = ({ profile }) => {
         )}
 
         {/* Admission */}
-        {sections?.showAdmission && profile.profile?.admissionInfo?.isOpen && (
+        {sections?.admission?.show !== false && profile.profile?.admissionInfo?.isOpen && (
           <section className="mb-20">
             <div className="border p-12 text-center">
               <h2 className="text-3xl font-light mb-4" style={{ color: primaryColor }}>

@@ -10,7 +10,7 @@ interface ClassicLayoutProps {
 
 export const ClassicLayout: React.FC<ClassicLayoutProps> = ({ profile }) => {
   const sections = profile.profile?.layout?.sections;
-  const theme = profile.profile?.layout?.theme;
+  const theme = profile.profile?.layout?.globalTheme;
   const primaryColor = theme?.primaryColor || profile.brandColor;
 
   return (
@@ -37,7 +37,7 @@ export const ClassicLayout: React.FC<ClassicLayoutProps> = ({ profile }) => {
       <div className="container mx-auto px-4 py-12">
         {/* Mission & Vision in Classic Style */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {sections?.showMission && profile.profile?.mission && (
+          {sections?.mission?.show !== false && profile.profile?.mission && (
             <div className="bg-white rounded-lg shadow-md p-8 border-t-4" style={{ borderColor: primaryColor }}>
               <h2 className="text-3xl font-serif font-bold mb-4 text-center" style={{ color: primaryColor }}>
                 Mission
@@ -45,7 +45,7 @@ export const ClassicLayout: React.FC<ClassicLayoutProps> = ({ profile }) => {
               <p className="text-gray-700 text-center leading-relaxed">{profile.profile.mission}</p>
             </div>
           )}
-          {sections?.showVision && profile.profile?.vision && (
+          {sections?.vision?.show !== false && profile.profile?.vision && (
             <div className="bg-white rounded-lg shadow-md p-8 border-t-4" style={{ borderColor: primaryColor }}>
               <h2 className="text-3xl font-serif font-bold mb-4 text-center" style={{ color: primaryColor }}>
                 Vision
@@ -56,7 +56,7 @@ export const ClassicLayout: React.FC<ClassicLayoutProps> = ({ profile }) => {
         </div>
 
         {/* Principal's Message in Classic Frame */}
-        {sections?.showPrincipalMessage && profile.profile?.principalMessage && (
+        {sections?.principalMessage?.show !== false && profile.profile?.principalMessage && (
           <div className="mb-12">
             <div className="bg-white rounded-lg shadow-lg p-8 border-8 border-double" style={{ borderColor: `${primaryColor}30` }}>
               <h2 className="text-3xl font-serif font-bold mb-6 text-center" style={{ color: primaryColor }}>
@@ -77,28 +77,31 @@ export const ClassicLayout: React.FC<ClassicLayoutProps> = ({ profile }) => {
         )}
 
         {/* Goals in Classic List */}
-        {sections?.showGoals && profile.profile?.goals && profile.profile.goals.length > 0 && (
+        {sections?.goals?.show !== false && profile.profile?.goals && profile.profile.goals.length > 0 && (
           <div className="mb-12">
             <h2 className="text-4xl font-serif font-bold text-center mb-8" style={{ color: primaryColor }}>
               Our Goals
             </h2>
             <div className="bg-white rounded-lg shadow-md p-8">
               <ol className="space-y-4">
-                {profile.profile.goals.map((goal, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="text-2xl font-bold mr-4" style={{ color: primaryColor }}>
-                      {index + 1}.
-                    </span>
-                    <span className="text-lg text-gray-700 leading-relaxed">{goal}</span>
-                  </li>
-                ))}
+                {profile.profile.goals.map((goal, index) => {
+                  const goalText = typeof goal === 'string' ? goal : (goal.title || goal.text || goal.description || 'Goal');
+                  return (
+                    <li key={index} className="flex items-start">
+                      <span className="text-2xl font-bold mr-4" style={{ color: primaryColor }}>
+                        {index + 1}.
+                      </span>
+                      <span className="text-lg text-gray-700 leading-relaxed">{goalText}</span>
+                    </li>
+                  );
+                })}
               </ol>
             </div>
           </div>
         )}
 
         {/* Facilities */}
-        {sections?.showFacilities && profile.profile?.facilities && profile.profile.facilities.length > 0 && (
+        {sections?.facilities?.show !== false && profile.profile?.facilities && profile.profile.facilities.length > 0 && (
           <div className="mb-12">
             <h2 className="text-4xl font-serif font-bold text-center mb-8" style={{ color: primaryColor }}>
               Facilities
@@ -117,7 +120,7 @@ export const ClassicLayout: React.FC<ClassicLayoutProps> = ({ profile }) => {
         )}
 
         {/* Achievements Timeline */}
-        {sections?.showAchievements && profile.profile?.achievements && profile.profile.achievements.length > 0 && (
+        {sections?.achievements?.show !== false && profile.profile?.achievements && profile.profile.achievements.length > 0 && (
           <div className="mb-12">
             <h2 className="text-4xl font-serif font-bold text-center mb-8" style={{ color: primaryColor }}>
               Milestones & Achievements

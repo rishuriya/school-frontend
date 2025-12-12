@@ -65,7 +65,19 @@ export default function Admissions() {
   const admissionInfo = schoolProfile?.profile?.admissionInfo;
   const isAdmissionOpen = admissionInfo?.isOpen ?? false;
   const admissionProcess = admissionInfo?.process;
-  const admissionRequirements = admissionInfo?.requirements || [];
+  
+  // Get requirements - check for new sectioned format first, fallback to legacy
+  const requirementSections = admissionInfo?.requirementSections && admissionInfo.requirementSections.length > 0
+    ? [...admissionInfo.requirementSections].sort((a, b) => a.order - b.order)
+    : admissionInfo?.requirements && admissionInfo.requirements.length > 0
+    ? [{
+        id: 'general',
+        title: 'General Requirements',
+        order: 0,
+        requirements: admissionInfo.requirements
+      }]
+    : [];
+  
   const admissionFees = admissionInfo?.fees;
   const admissionPolicy = admissionInfo?.policy;
   const admissionContact = {
@@ -79,12 +91,18 @@ export default function Admissions() {
   const admissionTemplate = schoolProfile?.profile?.layout?.sections?.admission?.template || 'banner';
   
   // Get layout templates for each admission subsection
-  const layoutSections = schoolProfile?.profile?.layout?.sections;
-  const processTemplate = (layoutSections as any)?.admissionProcess?.template || 'numbered';
-  const policyTemplate = (layoutSections as any)?.admissionPolicy?.template || 'numbered';
-  const datesTemplate = (layoutSections as any)?.admissionDates?.template || 'grid';
-  const faqsTemplate = (layoutSections as any)?.admissionFaqs?.template || 'grid';
-  const feesTemplate = (layoutSections as any)?.admissionFees?.template || 'table';
+  // Note: The layout structure only has a single 'admission' section, so we use defaults for subsections
+  type ProcessTemplate = 'numbered' | 'timeline' | 'cards' | 'checklist';
+  type PolicyTemplate = 'numbered' | 'cards' | 'accordion';
+  type DatesTemplate = 'grid' | 'timeline' | 'list' | 'calendar';
+  type FaqsTemplate = 'grid' | 'accordion' | 'list';
+  type FeesTemplate = 'table' | 'cards' | 'detailed';
+  
+  const processTemplate = 'numbered' as ProcessTemplate;
+  const policyTemplate = 'numbered' as PolicyTemplate;
+  const datesTemplate = 'grid' as DatesTemplate;
+  const faqsTemplate = 'grid' as FaqsTemplate;
+  const feesTemplate = 'table' as FeesTemplate;
 
   if (loading) {
     return (
@@ -366,22 +384,37 @@ export default function Admissions() {
               </p>
             </div>
             
-            {admissionRequirements.length > 0 ? (
+            {requirementSections.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-                  {admissionRequirements.map((requirement, index) => (
-                <Card key={index} variant="elevated" className="h-fit bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-emerald-500">
-                      <div className="flex items-start gap-3 mb-2">
-                        <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                          <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
+                {/* Display sectioned requirements */}
+                <div className="space-y-8 mb-12">
+                  {requirementSections.map((section, sectionIndex) => (
+                    <Card key={section.id || sectionIndex} variant="elevated" className="bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-emerald-500">
+                      <div className="p-6">
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-2xl font-bold text-gray-900">{section.title}</h3>
                         </div>
-                        <p className="text-gray-700 leading-relaxed">{requirement}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {section.requirements.map((requirement, reqIndex) => (
+                            <div key={reqIndex} className="flex items-start gap-3">
+                              <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                              <p className="text-gray-700 leading-relaxed flex-1">{requirement}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                </Card>
-              ))}
-            </div>
+                    </Card>
+                  ))}
+                </div>
 
                 {/* Fees Information if available - with Template Support */}
                 {admissionFees && Array.isArray(admissionFees) && admissionFees.length > 0 && (

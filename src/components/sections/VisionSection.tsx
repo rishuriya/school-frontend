@@ -38,7 +38,7 @@ export const VisionSection: React.FC<VisionSectionProps> = ({ profile, template 
               </div>
               <div className="order-1 lg:order-2">
                 <span className="text-sm uppercase tracking-wider font-semibold" style={{ color: secondaryColor }}>
-                  Where We're Headed
+                  Where We&apos;re Headed
                 </span>
                 <h2 className="text-5xl font-bold text-gray-900 mt-4 mb-6">Our Vision</h2>
               </div>

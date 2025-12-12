@@ -49,7 +49,6 @@ const Footer: React.FC = () => {
               {address && <p>📍 {address}</p>}
               {phone && <p>📞 {phone}</p>}
               {email && <p>✉️ {email}</p>}
-              {website && <p>🌐 {website}</p>}
             </div>
           </div>
 

@@ -23,35 +23,35 @@ export const DynamicSchoolProfile: React.FC<DynamicSchoolProfileProps> = ({ prof
         order: sections?.mission?.order || 1,
         show: sections?.mission?.show !== false,
         template: sections?.mission?.template || 'card',
-        component: <MissionSection profile={profile} template={sections?.mission?.template as any} />
+        component: <MissionSection profile={profile} template={sections?.mission?.template || 'card'} />
       },
       {
         key: 'vision',
         order: sections?.vision?.order || 2,
         show: sections?.vision?.show !== false,
         template: sections?.vision?.template || 'card',
-        component: <VisionSection profile={profile} template={sections?.vision?.template as any} />
+        component: <VisionSection profile={profile} template={sections?.vision?.template || 'card'} />
       },
       {
         key: 'goals',
         order: sections?.goals?.order || 3,
         show: sections?.goals?.show !== false,
         template: sections?.goals?.template || 'grid',
-        component: <GoalsSection profile={profile} template={sections?.goals?.template as any} />
+        component: <GoalsSection profile={profile} template={sections?.goals?.template || 'grid'} />
       },
       {
         key: 'facilities',
         order: sections?.facilities?.order || 4,
         show: sections?.facilities?.show !== false,
         template: sections?.facilities?.template || 'grid',
-        component: <FacilitiesSection profile={profile} template={sections?.facilities?.template as any} />
+        component: <FacilitiesSection profile={profile} template={sections?.facilities?.template || 'grid'} />
       },
       {
         key: 'admission',
         order: sections?.admission?.order || 8,
         show: sections?.admission?.show !== false && profile.profile?.admissionInfo?.isOpen,
         template: sections?.admission?.template || 'banner',
-        component: <AdmissionSection profile={profile} template={sections?.admission?.template as any} />
+        component: <AdmissionSection profile={profile} template={sections?.admission?.template || 'banner'} />
       }
     ];
 

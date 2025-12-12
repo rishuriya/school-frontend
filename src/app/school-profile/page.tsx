@@ -14,7 +14,7 @@ export default function SchoolProfilePage() {
 
   useEffect(() => {
     fetchSchoolProfile();
-  }, [schoolId]);
+  }, [schoolId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSchoolProfile = async () => {
     try {
@@ -22,8 +22,9 @@ export default function SchoolProfilePage() {
       setError(null);
       const data = await schoolProfileService.getSchoolProfileById(schoolId);
       setProfile(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load school profile');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load school profile';
+      setError(errorMessage);
       console.error('Error loading school profile:', err);
     } finally {
       setLoading(false);

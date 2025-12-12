@@ -8,18 +8,13 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Carousel from '../components/ui/Carousel';
 import Leadership from '../components/sections/Leadership';
+import GoalsSection from '../components/sections/GoalsSection';
 import Image from 'next/image';
 import schoolProfileService from '../services/schoolProfileService';
 import { APP_CONFIG } from '../config/app';
 import { SchoolProfile } from '../types/school';
 // Import mock data as fallback
 import {
-  carouselData,
-  mockSchoolInfo,
-  mockNews,
-  mockEvents,
-  leadershipData,
-  mockStudents,
   mockPrograms
 } from '../data/mockData';
 import {
@@ -35,10 +30,10 @@ interface CarouselItem {
   id: string;
   image: string;
   title: string;
-  subtitle?: string;
+  subtitle: string;
   description: string;
-  ctaText?: string;
-  ctaLink?: string;
+  ctaText: string;
+  ctaLink: string;
 }
 
 export default function Home() {
@@ -64,7 +59,7 @@ export default function Home() {
         const mappedSchoolInfo: SchoolInfo = {
           id: profile._id || '',
           name: profile.name,
-          tagline: profile.profile?.vision?.substring(0, 100) || 'Excellence in Education',
+          tagline: profile.moto || 'Excellence in Education',
           description: profile.profile?.mission || '',
           address: `${profile.address?.street || ''}, ${profile.address?.city || ''}, ${profile.address?.state || ''} ${profile.address?.zipCode || ''}`.trim(),
           city: profile.address?.city || '',
@@ -87,7 +82,7 @@ export default function Home() {
           if (carouselsRes.ok) {
             const carouselsData = await carouselsRes.json();
             if (carouselsData.success && carouselsData.data) {
-              const mappedCarousels: CarouselItem[] = carouselsData.data.map((carousel: any) => ({
+              const mappedCarousels: CarouselItem[] = carouselsData.data.map((carousel: { _id: string; image: string; title: string; subtitle?: string; description: string; ctaText?: string; ctaLink?: string }) => ({
                 id: carousel._id,
                 image: carousel.image,
                 title: carousel.title,
@@ -95,17 +90,17 @@ export default function Home() {
                 description: carousel.description,
                 ctaText: carousel.ctaText || 'Learn More',
                 ctaLink: carousel.ctaLink || '#',
-              }));
-              setCarousels(mappedCarousels.length > 0 ? mappedCarousels : carouselData);
+              })) as CarouselItem[];
+              setCarousels(mappedCarousels.length > 0 ? mappedCarousels : []);
             } else {
-              setCarousels(carouselData);
+              setCarousels([]);
             }
           } else {
-            setCarousels(carouselData);
+            setCarousels([]);
           }
         } catch (error) {
           console.error('Failed to fetch carousels:', error);
-          setCarousels(carouselData);
+          setCarousels([]);
         }
 
         // Fetch announcements (convert to news format)
@@ -127,16 +122,16 @@ export default function Home() {
                 category: ann.type === 'urgent' ? 'announcement' : 'general',
                 image: ann.attachments?.[0] || undefined,
               }));
-              setNews(mappedNews.length > 0 ? mappedNews : mockNews.slice(0, 3));
+              setNews(mappedNews.length > 0 ? mappedNews : []);
             } else {
-              setNews(mockNews.slice(0, 3));
+              setNews([]);
             }
           } else {
-            setNews(mockNews.slice(0, 3));
+            setNews([]);
           }
         } catch (error) {
           console.error('Failed to fetch announcements:', error);
-          setNews(mockNews.slice(0, 3));
+          setNews([]);
         }
         
         // Fetch events
@@ -162,16 +157,16 @@ export default function Home() {
                 category: evt.category || 'general',
                 image: evt.imageUrl,
               }));
-              setEvents(mappedEvents.length > 0 ? mappedEvents : mockEvents.slice(0, 3));
+              setEvents(mappedEvents.length > 0 ? mappedEvents : []);
             } else {
-              setEvents(mockEvents.slice(0, 3));
+              setEvents([]);
             }
           } else {
-            setEvents(mockEvents.slice(0, 3));
+            setEvents([]);
           }
         } catch (error) {
           console.error('Failed to fetch events:', error);
-          setEvents(mockEvents.slice(0, 3));
+          setEvents([]);
         }
         
         // Fetch teachers for leadership (filter those with messages/bio)
@@ -195,16 +190,16 @@ export default function Home() {
                   experience: teacher.experience ? `${teacher.experience}+ years of experience` : 'New to the team',
                   achievements: teacher.achievements || [],
                 }));
-              setLeadership(mappedLeadership.length > 0 ? mappedLeadership : leadershipData);
+              setLeadership(mappedLeadership.length > 0 ? mappedLeadership : []);
             } else {
-              setLeadership(leadershipData);
+              setLeadership([]);
             }
           } else {
-            setLeadership(leadershipData);
+            setLeadership([]);
           }
         } catch (error) {
           console.error('Failed to fetch teachers:', error);
-          setLeadership(leadershipData);
+          setLeadership([]);
         }
         
         // Fetch student leaders
@@ -223,16 +218,16 @@ export default function Home() {
                 description: student.message || 'Dedicated and hardworking student.',
                 achievements: student.achievements || [],
               }));
-              setStudents(mappedStudents.length > 0 ? mappedStudents : mockStudents.slice(0, 3));
+              setStudents(mappedStudents.length > 0 ? mappedStudents : []);
             } else {
-              setStudents(mockStudents.slice(0, 3));
+              setStudents([]);
             }
           } else {
-            setStudents(mockStudents.slice(0, 3));
+            setStudents([]);
           }
         } catch (error) {
           console.error('Failed to fetch student leaders:', error);
-          setStudents(mockStudents.slice(0, 3));
+          setStudents([]);
         }
         
         // Use mock data for programs (these would need to be added to backend)
@@ -242,12 +237,12 @@ export default function Home() {
       } catch (error) {
         console.error('Failed to fetch school data, using mock data:', error);
         // Fallback to mock data
-        setSchoolInfo(mockSchoolInfo);
-        setCarousels(carouselData);
-        setNews(mockNews.slice(0, 3));
-        setEvents(mockEvents.slice(0, 3));
-        setLeadership(leadershipData);
-        setStudents(mockStudents.slice(0, 3));
+        setSchoolInfo(null);
+        setCarousels([]);
+        setNews([]);
+        setEvents([]);
+        setLeadership([]);
+        setStudents([]);
         setPrograms(mockPrograms.slice(0, 3));
         setLoading(false);
       }
@@ -287,122 +282,14 @@ export default function Home() {
       </section>
 
       {/* Goals Section - Only show goals with icons */}
-      {schoolProfile?.profile?.goals && 
-       schoolProfile.profile.goals.filter(goal => goal.icon).length > 0 &&
-       schoolProfile.profile.layout?.sections?.goals?.show !== false && (() => {
-        // Filter goals that have icons/emojis
-        const goalsWithIcons = schoolProfile.profile.goals.filter(goal => goal.icon);
-        const sortedGoals = [...goalsWithIcons].sort((a, b) => (a.order || 0) - (b.order || 0));
-        const template = schoolProfile.profile.layout?.sections?.goals?.template || 'grid';
-        
-        // Helper to render goal icon
-        const renderGoalIcon = (goal: any, index: number) => {
-          const icon = goal.icon;
-          if (icon) {
-            // Check if it's an emoji
-            if (icon.match(/[\u{1F300}-\u{1F9FF}]/u)) {
-              return <span className="text-4xl">{icon}</span>;
-            }
-            // Otherwise render as SVG (fallback - we're using emojis from admin)
-            return <span className="text-4xl">{icon}</span>;
-          }
-          return null;
-        };
-
-        return (
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Our Goals
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Strategic goals that guide our educational mission and community development.
-            </p>
-          </div>
-
-            {/* Grid Layout */}
-            {template === 'grid' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {sortedGoals.map((goal, index) => (
-                  <Card key={index} variant="elevated" className="text-center group bg-white">
-                    <div className={`w-16 h-16 ${
-                      index % 4 === 0 ? 'bg-purple-600' :
-                      index % 4 === 1 ? 'bg-slate-500' :
-                      index % 4 === 2 ? 'bg-green-600' :
-                      'bg-orange-600'
-                    } rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                      {renderGoalIcon(goal, index)}
-                  </div>
-                    <p className="text-gray-600 leading-relaxed text-sm">{goal.text}</p>
-                </Card>
-                ))}
-              </div>
-            )}
-
-            {/* List Layout */}
-            {template === 'list' && (
-              <div className="max-w-3xl mx-auto space-y-4">
-                {sortedGoals.map((goal, index) => (
-                  <Card key={index} variant="elevated" className="bg-white">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                        {renderGoalIcon(goal, index)}
-                      </div>
-                      <p className="text-gray-700 leading-relaxed flex-1">{goal.text}</p>
-                  </div>
-                </Card>
-                ))}
-              </div>
-            )}
-
-            {/* Timeline Layout */}
-            {template === 'timeline' && (
-              <div className="max-w-4xl mx-auto">
-                {sortedGoals.map((goal, index) => (
-                  <div key={index} className="flex gap-6 mb-8 last:mb-0">
-                    <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                        {renderGoalIcon(goal, index)}
-                      </div>
-                      {index < sortedGoals.length - 1 && (
-                        <div className="w-0.5 h-full bg-blue-200 mt-2"></div>
-                      )}
-                    </div>
-                    <Card variant="elevated" className="flex-1 bg-white">
-                      <p className="text-gray-700 leading-relaxed">{goal.text}</p>
-                    </Card>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Cards Layout (Default) */}
-            {template === 'cards' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedGoals.map((goal, index) => {
-                  const colors = [
-                    { bg: 'bg-blue-600', border: 'border-blue-200', gradient: 'from-blue-50 to-blue-100' },
-                    { bg: 'bg-green-600', border: 'border-green-200', gradient: 'from-green-50 to-green-100' },
-                    { bg: 'bg-purple-600', border: 'border-purple-200', gradient: 'from-purple-50 to-purple-100' },
-                  ];
-                  const color = colors[index % 3];
-
-                  return (
-                    <Card key={index} variant="elevated" className={`text-center group bg-gradient-to-br ${color.gradient} border-2 ${color.border}`}>
-                      <div className={`w-16 h-16 ${color.bg} rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300`}>
-                        {renderGoalIcon(goal, index)}
-                  </div>
-                      <p className="text-gray-700 leading-relaxed font-medium">{goal.text}</p>
-                </Card>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </section>
-        );
-      })()}
+      {schoolProfile && (
+        <GoalsSection 
+          profile={schoolProfile} 
+          showOnlyWithIcons={true}
+          sectionTitle="Our Goals"
+          sectionDescription="Strategic goals that guide our educational mission and community development."
+        />
+      )}
 
       {/* Leadership Section */}
       <Leadership leaders={leadership} />
@@ -465,6 +352,7 @@ export default function Home() {
       </section>
 
       {/* News Section */}
+      {news.length > 0 && (
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -570,10 +458,12 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* Events Section */}
+      {events.length > 0 && (
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -628,10 +518,10 @@ export default function Home() {
                   <div className="absolute top-4 right-4">
                     <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 border border-gray-200">
                       <span className="text-xs font-medium text-gray-600">
-                        {new Date(event.date).toLocaleDateString('en-US', { 
+                        {event.date ? new Date(event.date).toLocaleDateString('en-US', { 
                           month: 'short', 
                           day: 'numeric' 
-                        })}
+                        }) : ''}
                       </span>
                     </div>
                   </div>
@@ -690,11 +580,13 @@ export default function Home() {
                 </svg>
               </Button>
             </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Students Section */}
+      {students.length > 0 && (
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -800,7 +692,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+      )}
       {/* CTA Section */}
       <section className="py-16 bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
