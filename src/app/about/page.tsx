@@ -11,7 +11,6 @@ import schoolProfileService from '../../services/schoolProfileService';
 import { APP_CONFIG } from '../../config/app';
 import { 
   mockSchoolInfo,
-  leadershipData,
   aboutContent,
   coreValues,
   facilities
@@ -81,16 +80,16 @@ export default function About() {
                   experience: teacher.experience ? `${teacher.experience}+ years of experience` : 'New to the team',
                   achievements: teacher.achievements || [],
                 }));
-              setLeadership(mappedLeadership.length > 0 ? mappedLeadership : leadershipData);
+              setLeadership(mappedLeadership.length > 0 ? mappedLeadership : []);
             } else {
-              setLeadership(leadershipData);
+              setLeadership([]);
             }
           } else {
-            setLeadership(leadershipData);
+            setLeadership([]);
           }
         } catch (error) {
           console.error('Failed to fetch teachers:', error);
-          setLeadership(leadershipData);
+          setLeadership([]);
         }
         
         // Map facilities from backend
@@ -136,7 +135,7 @@ export default function About() {
         console.error('Failed to fetch school data:', error);
         // Fallback to mock data
     setSchoolInfo(mockSchoolInfo);
-    setLeadership(leadershipData);
+    setLeadership([]);
     setAboutContentData(aboutContent);
     setCoreValuesData(coreValues);
     setFacilitiesData(facilities);
@@ -664,7 +663,9 @@ export default function About() {
       </section>
 
       {/* Leadership Section */}
-      <Leadership leaders={leadership} />
+      {leadership.length > 0 && (
+        <Leadership leaders={leadership} />
+      )}
 
       {/* Facilities Section - Only show if facilities exist and section is enabled */}
       {facilitiesData && facilitiesData.length > 0 && 
