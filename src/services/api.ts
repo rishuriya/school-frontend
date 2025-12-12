@@ -16,7 +16,7 @@ import {
 
 // Configuration for API endpoints
 const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api',
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://school-backend-api-4zqzsa7g3a-uc.a.run.app/api',
   useMockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || false, // Default to mock data
 };
 
