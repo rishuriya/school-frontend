@@ -162,7 +162,7 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
               <div className="pl-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{leader.name}</h3>
                 <p className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r ${getPositionColor(index)} text-white mb-3`}>
-                  {leader.position}
+                  {leader.position.charAt(0).toUpperCase() + leader.position.slice(1)}
                 </p>
                 {leader.experience && (
                   <p className="text-gray-600 mb-4">{leader.experience}</p>
