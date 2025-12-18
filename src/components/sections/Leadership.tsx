@@ -6,7 +6,7 @@ import Button from '../ui/Button';
 import { Leadership as LeadershipType } from '../../types/school';
 import Image from 'next/image';
 
-const MESSAGE_WORD_LIMIT = 200;
+const MESSAGE_WORD_LIMIT = 20;
 
 const getWordCount = (text: string): number => {
   const trimmed = text.trim();
@@ -36,7 +36,8 @@ interface LeadershipProps {
 
 const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
   const [activeTab, setActiveTab] = useState(0);
-  const [expandedMessages, setExpandedMessages] = useState<Record<string, boolean>>({});
+  // Track which leader's message is expanded (only one at a time)
+  const [expandedLeaderKey, setExpandedLeaderKey] = useState<string | null>(null);
 
   // Dynamic position colors based on index
   const getPositionColor = (index: number) => {
@@ -94,7 +95,7 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
     <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Leadership & Faculty Speaks
           </h2>
@@ -105,16 +106,18 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
 
         {/* Tab Navigation */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {leaders.map((leader, index) => (
+          {leaders.map((leader, index) => {
+            const leaderKey = leader.id ?? `leader-${index}`;
+            return (
             <button
-              key={leader.id}
+              key={leaderKey}
               onClick={() => setActiveTab(index)}
               className={`flex items-center space-x-3 px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                 activeTab === index
                   ? `bg-gradient-to-r ${getPositionColor(index)} text-white shadow-lg`
                   : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
               }`}
-            >
+              >
               <div className={`p-2 rounded-full ${
                 activeTab === index ? 'bg-white/20' : 'bg-gray-100'
               }`}>
@@ -122,14 +125,16 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
               </div>
               <span>{leader.position.charAt(0).toUpperCase() + leader.position.slice(1)}</span>
             </button>
-          ))}
+          )})}
         </div>
 
-        {/* Leadership Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {leaders.map((leader, index) => (
+        {/* Leadership Content - show all leaders */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {leaders.map((leader, index) => {
+            const leaderKey = leader.id ?? `leader-${index}`;
+            return (
             <Card
-              key={leader.id}
+              key={leaderKey}
               variant="elevated"
               className={`transition-all duration-500 transform ${
                 activeTab === index
@@ -169,9 +174,11 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">Message</h4>
                     {(() => {
                       const fullMessage = leader.message || '';
-                      const isExpanded = !!expandedMessages[leader.id];
+                      const isActiveCard = index === activeTab;
+                      const isExpanded = isActiveCard && expandedLeaderKey === leaderKey;
                       const wordCount = getWordCount(fullMessage);
-                      const shouldTruncate = wordCount > MESSAGE_WORD_LIMIT && !isExpanded;
+                      const shouldTruncate =
+                        !isActiveCard || (wordCount > MESSAGE_WORD_LIMIT && !isExpanded);
                       const displayText = shouldTruncate
                         ? truncateMessage(fullMessage, MESSAGE_WORD_LIMIT)
                         : fullMessage;
@@ -182,14 +189,11 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
                             &ldquo;{renderMessageWithLineBreaks(displayText)}
                             {shouldTruncate && '...'}&rdquo;
                           </p>
-                          {wordCount > MESSAGE_WORD_LIMIT && (
+                          {isActiveCard && wordCount > MESSAGE_WORD_LIMIT && (
                             <button
                               type="button"
                               onClick={() =>
-                                setExpandedMessages(prev => ({
-                                  ...prev,
-                                  [leader.id]: !isExpanded,
-                                }))
+                                setExpandedLeaderKey(isExpanded ? null : leaderKey)
                               }
                               className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-semibold"
                             >
@@ -246,7 +250,7 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
                 </div>
               </div>
             </Card>
-          ))}
+          )})}
         </div>
 
         {/* View All Button */}
