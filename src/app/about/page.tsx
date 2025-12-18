@@ -77,7 +77,6 @@ export default function About() {
                   message: teacher.message || 'Dedicated to student excellence.',
                   email: teacher.email,
                   phone: teacher.phone,
-                  experience: teacher.experience ? `${teacher.experience}+ years of experience` : 'New to the team',
                   achievements: teacher.achievements || [],
                 }));
               setLeadership(mappedLeadership.length > 0 ? mappedLeadership : []);

@@ -5,12 +5,38 @@ import Card from '../ui/Card';
 import Button from '../ui/Button';
 import { Leadership as LeadershipType } from '../../types/school';
 import Image from 'next/image';
+
+const MESSAGE_WORD_LIMIT = 200;
+
+const getWordCount = (text: string): number => {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+};
+
+const truncateMessage = (text: string, wordLimit: number): string => {
+  const trimmed = text.trim();
+  const words = trimmed.split(/\s+/);
+  if (words.length <= wordLimit) return trimmed;
+  return words.slice(0, wordLimit).join(' ');
+};
+
+const renderMessageWithLineBreaks = (text: string) => {
+  const lines = text.split('\n');
+  return lines.map((line, idx) => (
+    <React.Fragment key={idx}>
+      {line}
+      {idx < lines.length - 1 && <br />}
+    </React.Fragment>
+  ));
+};
 interface LeadershipProps {
   leaders: LeadershipType[];
 }
 
 const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const [expandedMessages, setExpandedMessages] = useState<Record<string, boolean>>({});
 
   // Dynamic position colors based on index
   const getPositionColor = (index: number) => {
@@ -94,7 +120,7 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
               }`}>
                 {getPositionIcon(leader.position)}
               </div>
-              <span>{leader.position}</span>
+              <span>{leader.position.charAt(0).toUpperCase() + leader.position.slice(1)}</span>
             </button>
           ))}
         </div>
@@ -141,9 +167,38 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
                 {leader.message && (
                   <div className="mb-6">
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">Message</h4>
-                    <p className="text-gray-600 leading-relaxed italic">
-                      &ldquo;{leader.message}&rdquo;
-                    </p>
+                    {(() => {
+                      const fullMessage = leader.message || '';
+                      const isExpanded = !!expandedMessages[leader.id];
+                      const wordCount = getWordCount(fullMessage);
+                      const shouldTruncate = wordCount > MESSAGE_WORD_LIMIT && !isExpanded;
+                      const displayText = shouldTruncate
+                        ? truncateMessage(fullMessage, MESSAGE_WORD_LIMIT)
+                        : fullMessage;
+
+                      return (
+                        <>
+                          <p className="text-gray-600 leading-relaxed italic">
+                            &ldquo;{renderMessageWithLineBreaks(displayText)}
+                            {shouldTruncate && '...'}&rdquo;
+                          </p>
+                          {wordCount > MESSAGE_WORD_LIMIT && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpandedMessages(prev => ({
+                                  ...prev,
+                                  [leader.id]: !isExpanded,
+                                }))
+                              }
+                              className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                            >
+                              {isExpanded ? 'Show less' : 'Show more'}
+                            </button>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 )}
 
