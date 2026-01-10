@@ -253,12 +253,7 @@ const Leadership: React.FC<LeadershipProps> = ({ leaders }) => {
           )})}
         </div>
 
-        {/* View All Button */}
-        <div className="text-center mt-12">
-          <Button variant="gradient" size="lg">
-            Meet Our Full Faculty Team
-          </Button>
-        </div>
+      
       </div>
     </section>
   );

@@ -293,62 +293,7 @@ export default function Home() {
       {/* Leadership Section */}
       <Leadership leaders={leadership} />
 
-      {/* Programs Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Our Programs
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Discover our diverse range of educational programs designed to meet the needs of every student and prepare them for future success through Christian formation and moral development.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {programs.map((program, index) => (
-              <Card key={program.id} variant="elevated" className="group bg-white">
-                <div className="h-40 bg-gray-100 rounded-lg mb-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 overflow-hidden">
-                  {program.image ? (
-                    <Image
-                      src={program.image}
-                      alt={program.name}
-                      width={400}
-                      height={400}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-2">
-                        <span className="text-white font-bold text-lg">{index + 1}</span>
-                      </div>
-                      <span className="text-gray-600 font-medium text-sm">Program Image</span>
-                    </div>
-                  )}
-                </div>
-                <h3 className="text-lg font-bold mb-2 text-gray-900">{program.name}</h3>
-                <p className="text-gray-600 mb-3 leading-relaxed text-sm">{program.description}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">Duration: {program.duration}</span>
-                  <Link href="/programs">
-                    <Button variant="outline" size="sm">
-                      Learn More
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
-            ))}
-          </div>
-          
-          <div className="text-center mt-8">
-            <Link href="/programs">
-              <Button variant="outline" size="lg">
-                View All Programs
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      
 
       {/* News Section */}
       {news.length > 0 && (
@@ -370,35 +315,61 @@ export default function Home() {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {news.map((item, index) => (
-              <Card key={item.id} variant="elevated" className="group bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-500">
+              <Card key={item.id} variant="elevated" className="group bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-500 overflow-hidden">
                 <div className="relative">
-                  <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300 overflow-hidden">
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={400}
-                        height={400}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {/* Decorative header with gradient and icon */}
+                  <div className={`h-32 bg-gradient-to-br ${
+                    item.category === 'achievement' ? 'from-green-400 to-green-600' :
+                    item.category === 'event' ? 'from-blue-400 to-blue-600' :
+                    item.category === 'announcement' ? 'from-yellow-400 to-yellow-600' :
+                    'from-gray-400 to-gray-600'
+                  } flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative overflow-hidden`}>
+                    {/* Pattern overlay */}
+                    <div className="absolute inset-0 opacity-10">
+                      <div className="absolute inset-0" style={{
+                        backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                        backgroundSize: '24px 24px'
+                      }}></div>
+                    </div>
+                    
+                    {/* Icon */}
+                    <div className="relative z-10">
+                      <div className={`w-20 h-20 rounded-full ${
+                        item.category === 'achievement' ? 'bg-green-700/20' :
+                        item.category === 'event' ? 'bg-blue-700/20' :
+                        item.category === 'announcement' ? 'bg-yellow-700/20' :
+                        'bg-gray-700/20'
+                      } backdrop-blur-sm flex items-center justify-center border-2 border-white/30`}>
+                        {item.category === 'achievement' && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                          </svg>
+                        )}
+                        {item.category === 'event' && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        )}
+                        {item.category === 'announcement' && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                          </svg>
+                        )}
+                        {item.category === 'general' && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                           </svg>
-                        </div>
-                        <span className="text-gray-600 font-medium">News Image</span>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
                   
-                  <div className="absolute top-4 left-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                      item.category === 'achievement' ? 'bg-green-100 text-green-800 border border-green-200' :
-                      item.category === 'event' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                      item.category === 'announcement' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
-                      'bg-gray-100 text-gray-800 border border-gray-200'
+                  <div className="absolute top-4 left-4 z-20">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
+                      item.category === 'achievement' ? 'bg-green-100/90 text-green-800 border border-green-200' :
+                      item.category === 'event' ? 'bg-blue-100/90 text-blue-800 border border-blue-200' :
+                      item.category === 'announcement' ? 'bg-yellow-100/90 text-yellow-800 border border-yellow-200' :
+                      'bg-gray-100/90 text-gray-800 border border-gray-200'
                     }`}>
                       {item.category === 'achievement' && '🏆'}
                       {item.category === 'event' && '📅'}
@@ -408,8 +379,8 @@ export default function Home() {
                     </span>
                   </div>
                   
-                  <div className="absolute top-4 right-4">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
+                  <div className="absolute top-4 right-4 z-20">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-sm">
                       <span className="text-xs font-medium text-gray-600">{item.date}</span>
                     </div>
                   </div>
@@ -423,42 +394,22 @@ export default function Home() {
                     {item.content.substring(0, 120)}...
                   </p>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                     <div className="flex items-center text-sm text-gray-500">
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                       <span>By {item.author}</span>
                     </div>
-                    <Link href="/news">
-                      <Button variant="outline" size="sm" className="group-hover:bg-blue-50 group-hover:border-blue-200 group-hover:text-blue-600 transition-all duration-200">
-                        Read More
-                        <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </Button>
-                    </Link>
                   </div>
                 </div>
               </Card>
             ))}
           </div>
           
-          <div className="text-center mt-12">
-            <Link href="/news">
-              <Button variant="outline" size="lg" className="group hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-all duration-200">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                </svg>
-                View All News & Announcements
-                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Button>
-            </Link>
-          </div>
-          </div>
-        </section>
+          
+        </div>
+      </section>
       )}
 
       {/* Events Section */}
@@ -481,46 +432,76 @@ export default function Home() {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {events.map((event) => (
-              <Card key={event.id} variant="elevated" className="group bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-green-500">
+              <Card key={event.id} variant="elevated" className="group bg-white hover:shadow-xl transition-all duration-300 border-l-4 border-l-green-500 overflow-hidden">
                 <div className="relative">
-                  <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300 overflow-hidden">
-                    {event.image ? (
-                      <Image
-                        src={event.image}
-                        alt={event.title}
-                        width={400}
-                        height={400}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {/* Decorative header with gradient and icon */}
+                  <div className={`h-32 bg-gradient-to-br ${
+                    event.category === 'academic' ? 'from-indigo-400 to-indigo-600' :
+                    event.category === 'cultural' ? 'from-pink-400 to-pink-600' :
+                    event.category === 'sports' ? 'from-orange-400 to-orange-600' :
+                    event.category === 'community' ? 'from-teal-400 to-teal-600' :
+                    'from-green-400 to-green-600'
+                  } flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative overflow-hidden`}>
+                    {/* Pattern overlay */}
+                    <div className="absolute inset-0 opacity-10">
+                      <div className="absolute inset-0" style={{
+                        backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                        backgroundSize: '24px 24px'
+                      }}></div>
+                    </div>
+                    
+                    {/* Icon */}
+                    <div className="relative z-10">
+                      <div className={`w-20 h-20 rounded-full ${
+                        event.category === 'academic' ? 'bg-indigo-700/20' :
+                        event.category === 'cultural' ? 'bg-pink-700/20' :
+                        event.category === 'sports' ? 'bg-orange-700/20' :
+                        event.category === 'community' ? 'bg-teal-700/20' :
+                        'bg-green-700/20'
+                      } backdrop-blur-sm flex items-center justify-center border-2 border-white/30`}>
+                        {event.category === 'academic' && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                        )}
+                        {event.category === 'cultural' && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                        {event.category === 'sports' && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                        )}
+                        {event.category === 'community' && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                        )}
+                        {!event.category && (
+                          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                        </div>
-                        <span className="text-gray-600 font-medium">Event Image</span>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
                   
-                  <div className="absolute top-4 left-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/90 backdrop-blur-sm border border-gray-200">
+                  <div className="absolute top-4 left-4 z-20">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/90 backdrop-blur-sm border border-gray-200 shadow-sm">
                       {event.category === 'academic' && '📚'}
                       {event.category === 'cultural' && '🎭'}
                       {event.category === 'sports' && '⚽'}
                       {event.category === 'community' && '🤝'}
-                      <span className="ml-1 capitalize">{event.category}</span>
+                      <span className="ml-1 capitalize">{event.category || 'event'}</span>
                     </span>
                   </div>
                   
-                  <div className="absolute top-4 right-4">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 border border-gray-200">
+                  <div className="absolute top-4 right-4 z-20">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 border border-gray-200 shadow-sm">
                       <span className="text-xs font-medium text-gray-600">
-                        {event.date ? new Date(event.date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        }) : ''}
+                        {event.date ? event.date.split(',').slice(0, 1).join('').trim() : ''}
                       </span>
                     </div>
                   </div>
@@ -534,21 +515,21 @@ export default function Home() {
                     {event.description}
                   </p>
                   
-                  <div className="space-y-2 mb-4">
+                  <div className="space-y-2 mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
                     <div className="flex items-center text-sm text-gray-600">
-                      <svg className="w-4 h-4 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 mr-3 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <span>{event.date}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
-                      <svg className="w-4 h-4 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 mr-3 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span>{event.time}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
-                      <svg className="w-4 h-4 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 mr-3 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -579,9 +560,9 @@ export default function Home() {
                 </svg>
               </Button>
             </Link>
-            </div>
           </div>
-        </section>
+        </div>
+      </section>
       )}
 
       {/* Students Section */}
