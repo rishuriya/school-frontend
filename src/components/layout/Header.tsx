@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import schoolProfileService from '../../services/schoolProfileService';
 import { APP_CONFIG } from '../../config/app';
-import { SchoolInfo } from '../../types/school';
+import { SchoolInfo, Facility } from '../../types/school';
 import Image from 'next/image';
+import { aboutApi } from '../../services/api';
 
 interface HeaderProps {
   overlay?: boolean;
@@ -16,6 +17,15 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
   const [schoolInfo, setSchoolInfo] = useState<SchoolInfo | null>(null);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+
+  // Helper function to create slug from facility name
+  const createSlug = (name: string): string => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  };
 
   React.useEffect(() => {
     const fetchSchoolInfo = async () => {
@@ -53,7 +63,20 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
         });
       }
     };
+
+    const fetchFacilities = async () => {
+      try {
+        const facilitiesData = await aboutApi.getFacilities();
+        // Sort by order if available
+        const sortedFacilities = [...facilitiesData].sort((a, b) => (a.order || 0) - (b.order || 0));
+        setFacilities(sortedFacilities);
+      } catch (error) {
+        console.error('Failed to fetch facilities:', error);
+      }
+    };
+
     fetchSchoolInfo();
+    fetchFacilities();
   }, []);
 
   const toggleMobileDropdown = (itemName: string) => {
@@ -99,11 +122,7 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
       href: '/facilities',
       children: [
         { name: 'All Facilities', href: '/facilities' },
-        { name: 'Parent Portal', href: '/facilities/parent-portal' },
-        { name: 'Sports Complex', href: '/facilities/sports-complex' },
-        { name: 'Science Lab', href: '/facilities/science-lab' },
-        { name: 'Library', href: '/facilities/library' },
-        { name: 'Other Facilities', href: '/facilities/others' },
+        // Dynamic facilities will be added here
       ]
     },
     {
@@ -121,6 +140,7 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
       href: '/events',
       children: [
         { name: 'Events', href: '/events' },
+        { name: 'Gallery', href: '/gallery' },
         { name: 'News', href: '/news' },
       ],
     },
@@ -135,6 +155,32 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
   ];
 
   const isCentered = !showTitle;
+
+  // Build dynamic navigation with facilities
+  const navigationWithFacilities = React.useMemo(() => {
+    const campusNav = navigation.find(item => item.name === 'Campus');
+    if (campusNav && facilities.length > 0) {
+      // Add dynamic facilities to Campus children with anchor links
+      const facilityChildren = facilities.map(facility => ({
+        name: facility.name,
+        href: `/facilities?facility=${createSlug(facility.name)}`
+      }));
+      
+      return navigation.map(item => {
+        if (item.name === 'Campus') {
+          return {
+            ...item,
+            children: [
+              { name: 'All Facilities', href: '/facilities' },
+              ...facilityChildren
+            ]
+          };
+        }
+        return item;
+      });
+    }
+    return navigation;
+  }, [facilities]);
 
   return (
     <header className={`${overlay ? 'absolute top-0 left-0 w-full z-50 bg-transparent' : 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200/50 sticky top-0 z-50'} overflow-visible`}>
@@ -186,7 +232,7 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex gap-1 relative items-center flex-1 min-w-0 justify-center max-w-full">
-            {navigation.map((item) => (
+            {navigationWithFacilities.map((item) => (
               <div
                 key={item.name}
                 className="relative group flex-shrink-0"
@@ -247,6 +293,7 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
                                child.name.includes('Process') ? '📋' :
                                child.name.includes('Requirements') ? '📝' :
                                child.name.includes('Events') ? '📅' :
+                               child.name.includes('Gallery') ? '📸' :
                                child.name.includes('News') ? '📰' :
                                child.name.includes('CBSE') ? '📜' :
                                child.name.includes('Payment') ? '💳' :
@@ -304,7 +351,7 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
         {isMenuOpen && (
           <div className="md:hidden max-h-[calc(100vh-4rem)] overflow-y-auto">
             <div className={`px-3 sm:px-4 pt-3 sm:pt-4 pb-4 sm:pb-6 space-y-1 sm:space-y-2 ${overlay ? 'bg-black/50 backdrop-blur-md border-t border-white/20' : 'bg-white/95 backdrop-blur-md border-t border-gray-200/50'}`}>
-              {navigation.map((item) => (
+              {navigationWithFacilities.map((item) => (
                 <div key={item.name} className="border-b border-gray-200/30 pb-1 sm:pb-2 last:border-b-0">
                   <div className="flex items-center justify-between min-h-[44px]">
                     {item.href ? (
@@ -352,12 +399,14 @@ const Header: React.FC<HeaderProps> = ({ overlay = false, showTitle = true }) =>
                              child.name.includes('Parent Portal') ? '👨‍👩‍👧‍👦' :
                              child.name.includes('Sports') ? '⚽' :
                              child.name.includes('Science') ? '🔬' :
+                             child.name.includes('Library') ? '📚' :
                              child.name.includes('Other') || child.name.includes('Facilities') ? '🏢' :
                              child.name.includes('Programs') ? '🎓' :
                              child.name.includes('Apply') ? '✍️' :
                              child.name.includes('Process') ? '📋' :
                              child.name.includes('Requirements') ? '📝' :
                              child.name.includes('Events') ? '📅' :
+                             child.name.includes('Gallery') ? '📸' :
                              child.name.includes('News') ? '📰' :
                              child.name.includes('CBSE') ? '📜' :
                              child.name.includes('Payment') ? '💳' :

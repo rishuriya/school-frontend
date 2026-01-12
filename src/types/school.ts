@@ -183,6 +183,29 @@ export interface AttendancePolicy {
   }[];
 }
 
+// Gallery Types
+export interface GalleryMedia {
+  url: string;
+  type: 'image' | 'video';
+  caption?: string;
+  uploadedAt: string | Date;
+}
+
+export interface Gallery {
+  _id: string;
+  id?: string; // For backward compatibility
+  schoolId: string;
+  title: string;
+  description?: string;
+  media: GalleryMedia[];
+  category: string;
+  isPublic: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  mediaCount?: number; // Virtual field
+  featuredImage?: string; // Virtual field
+}
+
 // School Profile Types
 export interface SchoolProfile {
   _id: string;

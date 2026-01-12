@@ -16,22 +16,27 @@ import {
   mockSchoolInfo,
   mockPrograms
 } from '../../data/mockData';
+import { programsApi } from '../../services/api';
 
-import Image from 'next/image';
 export default function Admissions() {
   const [schoolProfile, setSchoolProfile] = React.useState<SchoolProfile | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [schoolInfo, setSchoolInfo] = React.useState<SchoolInfo | null>(mockSchoolInfo);
   const [activeTab, setActiveTab] = useState('process');
-  const [programs] = React.useState<Program[]>(mockPrograms);
+  const [programs, setPrograms] = React.useState<Program[]>([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch school profile from backend
-        const profile = await schoolProfileService.getSchoolProfileById(APP_CONFIG.school.id);
+        // Fetch school profile and programs from backend
+        const [profile, programsData] = await Promise.all([
+          schoolProfileService.getSchoolProfileById(APP_CONFIG.school.id),
+          programsApi.getPrograms()
+        ]);
+        
         setSchoolProfile(profile);
+        setPrograms(programsData);
         
         // Map backend data to frontend format
         const mappedSchoolInfo: SchoolInfo = {
@@ -54,6 +59,7 @@ export default function Admissions() {
         console.error('Failed to fetch data:', error);
         // Use mock data as fallback
         setSchoolInfo(mockSchoolInfo);
+        setPrograms(mockPrograms);
         setLoading(false);
       }
     };
@@ -835,13 +841,27 @@ export default function Admissions() {
               {programs.map((program) => (
                 <Card key={program.id} variant="elevated" className="overflow-hidden bg-white">
                   <div className="aspect-w-16 aspect-h-9">
-                    <Image
-                      src={program.image || 'https://images.unsplash.com/photo-1523050854058-8df90110c9e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'} 
-                      alt={program.name}
-                      width={400}
-                      height={400}
-                      className="w-full h-40 object-cover"
-                    />
+                    {program.image ? (
+                      <img
+                        src={program.image}
+                        alt={program.name}
+                        className="w-full h-40 object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-40 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span className="text-white font-bold text-lg">
+                              {program.name.charAt(0)}
+                            </span>
+                          </div>
+                          <span className="text-gray-500 text-xs">Program Image</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-3">

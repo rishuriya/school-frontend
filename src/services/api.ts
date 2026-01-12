@@ -1,4 +1,4 @@
-import { SchoolInfo, NewsItem, Event, Faculty, Student, Program, ContactInfo, Leadership, AboutContent, CoreValue, Facility } from '../types/school';
+import { SchoolInfo, NewsItem, Event, Faculty, Student, Program, ContactInfo, Leadership, AboutContent, CoreValue, Facility, Gallery } from '../types/school';
 import { 
   mockSchoolInfo, 
   mockNews, 
@@ -93,7 +93,36 @@ export const aboutApi = {
       await new Promise(resolve => setTimeout(resolve, 100));
       return facilities;
     }
-    return apiCall<Facility[]>('/about/facilities');
+    // Fetch from school profile
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+      const response = await fetch(`${baseUrl}/public/school-profile/id/${schoolId}`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch school profile for facilities');
+        return facilities;
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data?.profile?.facilities) {
+        // Map backend facilities to frontend format
+        return data.data.profile.facilities.map((facility: any, index: number) => ({
+          id: `facility-${index}`,
+          name: facility.name || '',
+          description: facility.description || '',
+          image: facility.image || facility.imageUrl,
+          features: facility.features || [],
+          capacity: facility.capacity,
+          order: facility.order || index,
+        }));
+      }
+      
+      return facilities;
+    } catch (error) {
+      console.error('Error fetching facilities:', error);
+      return facilities;
+    }
   }
 };
 
@@ -344,7 +373,59 @@ export const programsApi = {
       await new Promise(resolve => setTimeout(resolve, 100));
       return mockPrograms;
     }
-    return apiCall<Program[]>('/programs');
+    // Fetch from school profile
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+      const response = await fetch(`${baseUrl}/public/school-profile/id/${schoolId}`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch school profile for programs');
+        return mockPrograms;
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data?.profile?.programs) {
+        // Map backend programs to frontend format
+        return data.data.profile.programs.map((program: any, index: number) => {
+          // Handle eligibility - could be string or array
+          const eligibility = program.eligibility || [];
+          const requirements = Array.isArray(eligibility) ? eligibility : (eligibility ? [eligibility] : []);
+          
+          // Try to infer category from name if not provided
+          const nameLower = (program.name || '').toLowerCase();
+          let category: 'elementary' | 'middle' | 'high' | 'specialized' = 'general' as any;
+          if (nameLower.includes('elementary') || nameLower.includes('primary')) {
+            category = 'elementary';
+          } else if (nameLower.includes('middle') || nameLower.includes('junior')) {
+            category = 'middle';
+          } else if (nameLower.includes('high') || nameLower.includes('senior') || nameLower.includes('secondary')) {
+            category = 'high';
+          } else if (nameLower.includes('advanced') || nameLower.includes('special')) {
+            category = 'specialized';
+          }
+          
+          return {
+            id: `program-${index}`,
+            name: program.name || '',
+            description: program.description || '',
+            duration: program.duration || '',
+            category: program.category || category,
+            requirements: requirements,
+            image: program.image || program.imageUrl,
+            features: program.features || [],
+            ageGroup: program.ageGroup || '',
+            classSize: program.classSize || '',
+            tuition: program.tuition || '',
+          };
+        });
+      }
+      
+      return mockPrograms;
+    } catch (error) {
+      console.error('Error fetching programs:', error);
+      return mockPrograms;
+    }
   }
 };
 
@@ -377,5 +458,100 @@ export const contactApi = {
       throw new Error(`Send failed: ${response.statusText}`);
     }
     return response.json();
+  }
+};
+
+// Gallery API
+export const galleryApi = {
+  getGalleries: async (category?: string): Promise<Gallery[]> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+      let endpoint = `${baseUrl}/public/school/${schoolId}/gallery`;
+      
+      // Backend accepts category as query parameter directly
+      if (category && category !== 'all') {
+        endpoint += `?category=${encodeURIComponent(category)}`;
+      }
+      
+      const response = await fetch(endpoint);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch galleries from backend');
+        return [];
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Handle both single gallery and array of galleries
+        const galleries = Array.isArray(data.data) ? data.data : (data.data.galleries || []);
+        return galleries.map((gallery: any) => ({
+          _id: gallery._id || gallery.id,
+          id: gallery._id || gallery.id,
+          schoolId: gallery.schoolId || schoolId,
+          title: gallery.title,
+          description: gallery.description,
+          // Backend might return 'images' or 'media', handle both
+          media: gallery.media || gallery.images || [],
+          category: gallery.category,
+          isPublic: gallery.isPublic !== undefined ? gallery.isPublic : true,
+          createdAt: gallery.createdAt,
+          updatedAt: gallery.updatedAt,
+          mediaCount: gallery.mediaCount || (gallery.media ? gallery.media.length : (gallery.images ? gallery.images.length : 0)),
+          featuredImage: gallery.featuredImage || (gallery.media && gallery.media.length > 0 
+            ? gallery.media.find((m: any) => m.type === 'image')?.url || gallery.media[0]?.url 
+            : (gallery.images && gallery.images.length > 0
+              ? gallery.images[0]?.url || null
+              : null)),
+        }));
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error fetching galleries:', error);
+      return [];
+    }
+  },
+
+  getGalleryById: async (id: string): Promise<Gallery | null> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+      const response = await fetch(`${baseUrl}/public/school/${schoolId}/gallery/${id}`);
+      
+      if (!response.ok) {
+        console.error('Failed to fetch gallery from backend');
+        return null;
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        const gallery = data.data;
+        return {
+          _id: gallery._id || gallery.id,
+          id: gallery._id || gallery.id,
+          schoolId: gallery.schoolId || schoolId,
+          title: gallery.title,
+          description: gallery.description,
+          // Backend might return 'images' or 'media', handle both
+          media: gallery.media || gallery.images || [],
+          category: gallery.category,
+          isPublic: gallery.isPublic !== undefined ? gallery.isPublic : true,
+          createdAt: gallery.createdAt,
+          updatedAt: gallery.updatedAt,
+          mediaCount: gallery.mediaCount || (gallery.media ? gallery.media.length : (gallery.images ? gallery.images.length : 0)),
+          featuredImage: gallery.featuredImage || (gallery.media && gallery.media.length > 0 
+            ? gallery.media.find((m: any) => m.type === 'image')?.url || gallery.media[0]?.url 
+            : (gallery.images && gallery.images.length > 0
+              ? gallery.images[0]?.url || null
+              : null)),
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error fetching gallery:', error);
+      return null;
+    }
   }
 }; 

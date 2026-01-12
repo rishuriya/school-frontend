@@ -12,7 +12,6 @@ import {
 import {  
   Program
 } from '../../types/school';
-import Image from 'next/image';
 export default function Programs() {
   // Removed unused schoolInfo state
   const [programs, setPrograms] = React.useState<Program[]>([]);
@@ -35,14 +34,29 @@ export default function Programs() {
     fetchData();
   }, []);
 
-  // Program categories
-  const categories = [
-    { id: 'all', name: 'All Programs', color: 'from-blue-500 to-purple-600' },
-    { id: 'elementary', name: 'Elementary School', color: 'from-green-500 to-teal-600' },
-    { id: 'middle', name: 'Middle School', color: 'from-purple-500 to-pink-600' },
-    { id: 'high', name: 'High School', color: 'from-yellow-500 to-orange-600' },
-    { id: 'specialized', name: 'Advanced Programs', color: 'from-red-500 to-pink-600' }
-  ];
+  // Program categories - dynamically generated from programs
+  const categories = React.useMemo(() => {
+    const categoryMap: { [key: string]: { name: string; color: string } } = {
+      'elementary': { name: 'Elementary School', color: 'from-green-500 to-teal-600' },
+      'middle': { name: 'Middle School', color: 'from-purple-500 to-pink-600' },
+      'high': { name: 'High School', color: 'from-yellow-500 to-orange-600' },
+      'specialized': { name: 'Advanced Programs', color: 'from-red-500 to-pink-600' },
+      'general': { name: 'General Programs', color: 'from-blue-500 to-purple-600' }
+    };
+    
+    const uniqueCategories = Array.from(
+      new Set(programs.map(p => p.category).filter(Boolean))
+    );
+    
+    return [
+      { id: 'all', name: 'All Programs', color: 'from-blue-500 to-purple-600' },
+      ...uniqueCategories.map(cat => ({
+        id: cat,
+        name: categoryMap[cat]?.name || cat.charAt(0).toUpperCase() + cat.slice(1),
+        color: categoryMap[cat]?.color || 'from-blue-500 to-purple-600'
+      }))
+    ];
+  }, [programs]);
 
   // Filter programs based on selected category
   const filteredPrograms = selectedCategory === 'all' 
@@ -171,12 +185,13 @@ export default function Programs() {
               <Card key={program.id} variant="elevated" className="group hover:scale-105 transition-all duration-500">
                 <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl mb-6 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 overflow-hidden">
                   {program.image ? (
-                    <Image
+                    <img
                       src={program.image}
                       alt={program.name}
-                      width={400}
-                      height={400}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
                     />
                   ) : (
                     <div className="text-center">
