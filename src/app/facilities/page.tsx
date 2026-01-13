@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
@@ -16,7 +16,7 @@ const createSlug = (name: string): string => {
     .replace(/(^-|-$)/g, '');
 };
 
-export default function FacilitiesPage() {
+function FacilitiesContent() {
   const [facilities, setFacilities] = React.useState<Facility[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [expandedFacility, setExpandedFacility] = React.useState<string | null>(null);
@@ -275,5 +275,20 @@ export default function FacilitiesPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function FacilitiesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading facilities...</p>
+        </div>
+      </div>
+    }>
+      <FacilitiesContent />
+    </Suspense>
   );
 }

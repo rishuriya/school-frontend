@@ -585,7 +585,7 @@ export default function GalleryPage() {
             className="fixed inset-0 bg-black z-[60] flex items-center justify-center select-none"
             onClick={closeImageViewer}
             onContextMenu={handleContextMenu}
-            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+            style={{ userSelect: 'none', WebkitUserSelect: 'none' } as React.CSSProperties}
           >
             {/* Close Button */}
             <button
@@ -652,10 +652,9 @@ export default function GalleryPage() {
                     WebkitUserSelect: 'none', 
                     WebkitUserDrag: 'none',
                     pointerEvents: 'auto'
-                  }}
+                  } as React.CSSProperties}
                   onContextMenu={handleContextMenu}
                   onDragStart={handleDragStart}
-                  onSelectStart={(e) => e.preventDefault()}
                   draggable={false}
                 />
               )}
