@@ -61,21 +61,22 @@ export interface ContactInfo {
   email: string;
   website: string;
   socialMedia: {
-    facebook?: string;
-    twitter?: string;
-    instagram?: string;
-    linkedin?: string;
-  };
+    platform: string;
+    url: string;
+  }[];
 }
 
 export interface NewsItem {
   id: string;
   title: string;
   content: string;
-  image?: string;
   date: string;
   author: string;
-  category: 'announcement' | 'event' | 'achievement' | 'general';
+  category: string;
+  image?: string;
+  _id?: string;
+  type?: string;
+  attachments?: string[];
 }
 
 export interface Event {
@@ -231,7 +232,7 @@ export interface SchoolProfile {
   profile?: {
     mission?: string;
     vision?: string;
-    
+
     goals?: {
       text?: string; // Legacy support
       title?: string; // New format
@@ -285,6 +286,7 @@ export interface SchoolProfile {
       fees?: {
         category: string;
         amount: string;
+        classes?: string[];
         description?: string;
         order: number;
       }[];
@@ -302,6 +304,12 @@ export interface SchoolProfile {
         answer: string;
         order: number;
       }[];
+      feeRules?: {
+        title: string;
+        description?: string;
+        rules: string[];
+        order: number;
+      }[];
     };
     facilities?: {
       name: string;
@@ -316,12 +324,9 @@ export interface SchoolProfile {
       image?: string;
     }[];
     socialMedia?: {
-      facebook?: string;
-      twitter?: string;
-      instagram?: string;
-      linkedin?: string;
-      youtube?: string;
-    };
+      platform: string;
+      url: string;
+    }[];
     layout?: {
       globalTheme?: {
         primaryColor?: string;
@@ -381,4 +386,33 @@ export interface SchoolProfile {
   moto?: string;
   createdAt?: string;
   updatedAt?: string;
-} 
+}
+
+// School Document Types (Curriculum, Syllabus, Fee Structure)
+export interface SchoolDocument {
+  _id: string;
+  documentType: 'curriculum' | 'syllabus' | 'fee_structure';
+  className: string;
+  subject?: string;
+  title: string;
+  description?: string;
+  fileUrl: string;
+  academicYear?: string;
+  createdAt: string;
+}
+
+// Transfer Certificate Types
+export interface TransferCertificate {
+  _id: string;
+  tcNumber: string;
+  regNo: string;
+  studentName: string;
+  dob: string;
+  studentClass: string;
+  issueDate: string;
+  reason: string;
+  remarks?: string;
+  fileUrl?: string;
+  status: 'draft' | 'issued' | 'revoked';
+  createdAt: string;
+}

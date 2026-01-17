@@ -595,12 +595,12 @@ export const mockContactInfo: ContactInfo = {
   phone: "+91 120 4567890",
   email: "info@stjosephcatholic.edu",
   website: "www.stjosephcatholic.edu",
-  socialMedia: {
-    facebook: "https://facebook.com/stjosephcatholicschool",
-    twitter: "https://twitter.com/stjosephcatholic",
-    instagram: "https://instagram.com/stjosephcatholic",
-    linkedin: "https://linkedin.com/company/stjosephcatholicschool"
-  }
+  socialMedia: [
+    { platform: 'facebook', url: 'https://facebook.com/stjosephcatholicschool' },
+    { platform: 'twitter', url: 'https://twitter.com/stjosephcatholic' },
+    { platform: 'instagram', url: 'https://instagram.com/stjosephcatholic' },
+    { platform: 'linkedin', url: 'https://linkedin.com/company/stjosephcatholicschool' }
+  ]
 };
 
 // School Uniform Specifications

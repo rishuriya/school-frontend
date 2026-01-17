@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { SchoolProfile } from '@/types/school';
 
 interface AdmissionSectionProps {
@@ -55,7 +56,7 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
                   <h3 className="text-2xl font-bold mb-4 text-gray-900">Admission Process</h3>
                   {Array.isArray(admissionInfo.process) ? (
                     <ol className="space-y-2">
-                      {admissionInfo.process.map((step, index) => (
+                      {admissionInfo.process.map((step: string, index: number) => (
                         <li key={index} className="flex items-start text-gray-700">
                           <span className="font-semibold mr-2 text-green-600">{index + 1}.</span>
                           <span>{step}</span>
@@ -75,7 +76,7 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
                       <div key={sectionIndex} className="border-l-4 border-green-500 pl-4">
                         <h4 className="text-lg font-semibold text-gray-800 mb-3">{section.title}</h4>
                         <ul className="space-y-2">
-                          {section.requirements.map((req, index) => (
+                          {section.requirements.map((req: string, index: number) => (
                             <li key={index} className="flex items-start">
                               <span className="text-green-600 mr-3">✓</span>
                               <span className="text-gray-700">{req}</span>
@@ -108,7 +109,7 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
                   <h3 className="text-xl font-bold mb-3" style={{ color: primaryColor }}>Process</h3>
                   {Array.isArray(admissionInfo.process) ? (
                     <ol className="space-y-2">
-                      {admissionInfo.process.map((step, index) => (
+                      {admissionInfo.process.map((step: string, index: number) => (
                         <li key={index} className="text-gray-700 text-sm">
                           <span className="font-semibold mr-1">{index + 1}.</span>
                           {step}
@@ -128,7 +129,7 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
                       <div key={sectionIndex}>
                         <h4 className="font-semibold text-gray-800 mb-2 text-sm">{section.title}</h4>
                         <ul className="space-y-1 ml-2">
-                          {section.requirements.map((req, index) => (
+                          {section.requirements.map((req: string, index: number) => (
                             <li key={index} className="text-gray-700 text-sm">✓ {req}</li>
                           ))}
                         </ul>
@@ -137,10 +138,27 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
                   </div>
                 </div>
               )}
-              {admissionInfo.fees && (
+              {admissionInfo.fees && admissionInfo.fees.length > 0 && (
                 <div className="bg-gray-50 rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-3" style={{ color: primaryColor }}>Fee Structure</h3>
-                  <p className="text-gray-700">{admissionInfo.fees.map((fee) => fee.category).join(', ')}</p>
+                  <div className="space-y-3">
+                    {admissionInfo.fees.slice(0, 4).map((fee: any, idx: number) => (
+                      <div key={idx} className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
+                        <span className="text-gray-600">{fee.category}</span>
+                        <span className="font-bold text-green-600">{fee.amount}</span>
+                      </div>
+                    ))}
+                    {admissionInfo.fees.length > 4 && (
+                      <p className="text-xs text-gray-500 italic">+{admissionInfo.fees.length - 4} more categories</p>
+                    )}
+                    <Link
+                      href="/students/fees"
+                      className="inline-block mt-4 text-sm font-semibold hover:opacity-80 transition-opacity"
+                      style={{ color: primaryColor }}
+                    >
+                      View Class-wise Fees →
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
@@ -188,7 +206,7 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
                   <h3 className="text-2xl font-bold mb-4">Admission Process</h3>
                   {Array.isArray(admissionInfo.process) ? (
                     <ol className="space-y-2">
-                      {admissionInfo.process.map((step, index) => (
+                      {admissionInfo.process.map((step: string, index: number) => (
                         <li key={index} className="flex items-start opacity-95">
                           <span className="font-semibold mr-2">{index + 1}.</span>
                           <span>{step}</span>
@@ -208,7 +226,7 @@ export const AdmissionSection: React.FC<AdmissionSectionProps> = ({ profile, tem
                       <div key={sectionIndex} className="border-l-4 border-white/30 pl-4">
                         <h4 className="text-lg font-semibold mb-2 opacity-95">{section.title}</h4>
                         <ul className="space-y-2">
-                          {section.requirements.map((req, index) => (
+                          {section.requirements.map((req: string, index: number) => (
                             <li key={index} className="flex items-start opacity-95">
                               <span className="mr-2">✓</span>
                               <span>{req}</span>

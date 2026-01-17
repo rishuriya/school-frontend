@@ -1,11 +1,11 @@
-import { SchoolInfo, NewsItem, Event, Faculty, Student, Program, ContactInfo, Leadership, AboutContent, CoreValue, Facility, Gallery } from '../types/school';
-import { 
-  mockSchoolInfo, 
-  mockNews, 
-  mockEvents, 
-  mockFaculty, 
-  mockStudents, 
-  mockPrograms, 
+import { SchoolProfile, SchoolInfo, NewsItem, Event, Faculty, Student, Program, ContactInfo, Leadership, AboutContent, CoreValue, Facility, Gallery, SchoolDocument, TransferCertificate } from '../types/school';
+import {
+  mockSchoolInfo,
+  mockNews,
+  mockEvents,
+  mockFaculty,
+  mockStudents,
+  mockPrograms,
   mockContactInfo,
   leadershipData,
   heroesData,
@@ -18,6 +18,14 @@ import {
 const API_CONFIG = {
   baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://school-backend-api-4zqzsa7g3a-uc.a.run.app/api',
   useMockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || false, // Default to mock data
+};
+
+// Helper for absolute media URLs
+export const getMediaUrl = (url?: string) => {
+  if (!url) return undefined;
+  if (url.startsWith('http')) return url;
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://school-backend-api-4zqzsa7g3a-uc.a.run.app/api').replace('/api', '');
+  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
 // Generic API call function
@@ -98,12 +106,12 @@ export const aboutApi = {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
       const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
       const response = await fetch(`${baseUrl}/public/school-profile/id/${schoolId}`);
-      
+
       if (!response.ok) {
         console.error('Failed to fetch school profile for facilities');
         return facilities;
       }
-      
+
       const data = await response.json();
       if (data.success && data.data?.profile?.facilities) {
         // Map backend facilities to frontend format
@@ -117,7 +125,7 @@ export const aboutApi = {
           order: facility.order || index,
         }));
       }
-      
+
       return facilities;
     } catch (error) {
       console.error('Error fetching facilities:', error);
@@ -212,12 +220,12 @@ export const eventsApi = {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
       const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
       const response = await fetch(`${baseUrl}/public/school/${schoolId}/events`);
-      
+
       if (!response.ok) {
         console.error('Failed to fetch events from backend, using mock data');
         return mockEvents;
       }
-      
+
       const data = await response.json();
       if (data.success && data.data) {
         // Map backend event format to frontend format
@@ -241,25 +249,25 @@ export const eventsApi = {
           description: evt.description,
           startDate: evt.startDate,
           endDate: evt.endDate,
-          date: new Date(evt.startDate).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          date: new Date(evt.startDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
           }),
-          time: new Date(evt.startDate).toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+          time: new Date(evt.startDate).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
           }),
           location: evt.location || 'School Campus',
           category: evt.category || 'general',
-          imageUrl: evt.imageUrl,
-          image: evt.imageUrl,
+          imageUrl: getMediaUrl(evt.imageUrl),
+          image: getMediaUrl(evt.imageUrl),
           isPublic: evt.isPublic,
           registrationRequired: evt.registrationRequired,
           maxParticipants: evt.maxParticipants,
         }));
       }
-      
+
       return mockEvents;
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -272,12 +280,12 @@ export const eventsApi = {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
       const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
       const response = await fetch(`${baseUrl}/public/school/${schoolId}/events`);
-      
+
       if (!response.ok) {
         console.error('Failed to fetch upcoming events from backend, using mock data');
         return mockEvents.filter(event => event.isUpcoming);
       }
-      
+
       const data = await response.json();
       if (data.success && data.data) {
         // Map backend event format to frontend format
@@ -301,14 +309,14 @@ export const eventsApi = {
           description: evt.description,
           startDate: evt.startDate,
           endDate: evt.endDate,
-          date: new Date(evt.startDate).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          date: new Date(evt.startDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
           }),
-          time: new Date(evt.startDate).toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+          time: new Date(evt.startDate).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
           }),
           location: evt.location || 'School Campus',
           category: evt.category || 'general',
@@ -319,7 +327,7 @@ export const eventsApi = {
           maxParticipants: evt.maxParticipants,
         }));
       }
-      
+
       return mockEvents.filter(event => event.isUpcoming);
     } catch (error) {
       console.error('Error fetching upcoming events:', error);
@@ -378,12 +386,12 @@ export const programsApi = {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
       const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
       const response = await fetch(`${baseUrl}/public/school-profile/id/${schoolId}`);
-      
+
       if (!response.ok) {
         console.error('Failed to fetch school profile for programs');
         return mockPrograms;
       }
-      
+
       const data = await response.json();
       if (data.success && data.data?.profile?.programs) {
         // Map backend programs to frontend format
@@ -391,7 +399,7 @@ export const programsApi = {
           // Handle eligibility - could be string or array
           const eligibility = program.eligibility || [];
           const requirements = Array.isArray(eligibility) ? eligibility : (eligibility ? [eligibility] : []);
-          
+
           // Try to infer category from name if not provided
           const nameLower = (program.name || '').toLowerCase();
           let category: 'elementary' | 'middle' | 'high' | 'specialized' = 'general' as any;
@@ -404,7 +412,7 @@ export const programsApi = {
           } else if (nameLower.includes('advanced') || nameLower.includes('special')) {
             category = 'specialized';
           }
-          
+
           return {
             id: `program-${index}`,
             name: program.name || '',
@@ -420,7 +428,7 @@ export const programsApi = {
           };
         });
       }
-      
+
       return mockPrograms;
     } catch (error) {
       console.error('Error fetching programs:', error);
@@ -468,19 +476,19 @@ export const galleryApi = {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
       const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
       let endpoint = `${baseUrl}/public/school/${schoolId}/gallery`;
-      
+
       // Backend accepts category as query parameter directly
       if (category && category !== 'all') {
         endpoint += `?category=${encodeURIComponent(category)}`;
       }
-      
+
       const response = await fetch(endpoint);
-      
+
       if (!response.ok) {
         console.error('Failed to fetch galleries from backend');
         return [];
       }
-      
+
       const data = await response.json();
       if (data.success && data.data) {
         // Handle both single gallery and array of galleries
@@ -498,14 +506,14 @@ export const galleryApi = {
           createdAt: gallery.createdAt,
           updatedAt: gallery.updatedAt,
           mediaCount: gallery.mediaCount || (gallery.media ? gallery.media.length : (gallery.images ? gallery.images.length : 0)),
-          featuredImage: gallery.featuredImage || (gallery.media && gallery.media.length > 0 
-            ? gallery.media.find((m: any) => m.type === 'image')?.url || gallery.media[0]?.url 
+          featuredImage: gallery.featuredImage || (gallery.media && gallery.media.length > 0
+            ? gallery.media.find((m: any) => m.type === 'image')?.url || gallery.media[0]?.url
             : (gallery.images && gallery.images.length > 0
               ? gallery.images[0]?.url || null
               : null)),
         }));
       }
-      
+
       return [];
     } catch (error) {
       console.error('Error fetching galleries:', error);
@@ -518,12 +526,12 @@ export const galleryApi = {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
       const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
       const response = await fetch(`${baseUrl}/public/school/${schoolId}/gallery/${id}`);
-      
+
       if (!response.ok) {
         console.error('Failed to fetch gallery from backend');
         return null;
       }
-      
+
       const data = await response.json();
       if (data.success && data.data) {
         const gallery = data.data;
@@ -540,18 +548,199 @@ export const galleryApi = {
           createdAt: gallery.createdAt,
           updatedAt: gallery.updatedAt,
           mediaCount: gallery.mediaCount || (gallery.media ? gallery.media.length : (gallery.images ? gallery.images.length : 0)),
-          featuredImage: gallery.featuredImage || (gallery.media && gallery.media.length > 0 
-            ? gallery.media.find((m: any) => m.type === 'image')?.url || gallery.media[0]?.url 
+          featuredImage: gallery.featuredImage || (gallery.media && gallery.media.length > 0
+            ? gallery.media.find((m: any) => m.type === 'image')?.url || gallery.media[0]?.url
             : (gallery.images && gallery.images.length > 0
               ? gallery.images[0]?.url || null
               : null)),
         };
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error fetching gallery:', error);
       return null;
     }
   }
-}; 
+};
+
+// Curriculum API
+export const curriculumApi = {
+  getCurriculum: async (className?: string, subject?: string): Promise<SchoolDocument[]> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+
+      let endpoint = `${baseUrl}/public/school/${schoolId}/curriculum`;
+      const params = new URLSearchParams();
+      if (className) params.append('className', className);
+      if (subject) params.append('subject', subject);
+      if (params.toString()) endpoint += `?${params.toString()}`;
+
+      const response = await fetch(endpoint);
+
+      if (!response.ok) {
+        console.error('Failed to fetch curriculum from backend');
+        return [];
+      }
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        return data.data;
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error fetching curriculum:', error);
+      return [];
+    }
+  }
+};
+
+// Syllabus API
+export const syllabusApi = {
+  getSyllabus: async (className?: string, subject?: string): Promise<SchoolDocument[]> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+
+      let endpoint = `${baseUrl}/public/school/${schoolId}/syllabus`;
+      const params = new URLSearchParams();
+      if (className) params.append('className', className);
+      if (subject) params.append('subject', subject);
+      if (params.toString()) endpoint += `?${params.toString()}`;
+
+      const response = await fetch(endpoint);
+
+      if (!response.ok) {
+        console.error('Failed to fetch syllabus from backend');
+        return [];
+      }
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        return data.data;
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error fetching syllabus:', error);
+      return [];
+    }
+  }
+};
+
+// Transfer Certificate API
+export const tcApi = {
+  verifyAndGetTC: async (regNo: string, dob: string): Promise<{
+    success: boolean;
+    data?: TransferCertificate;
+    message: string;
+  }> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+
+      const response = await fetch(`${baseUrl}/public/school/${schoolId}/transfer-certificate/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ regNo, dob }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.message || 'Failed to retrieve transfer certificate',
+        };
+      }
+
+      return {
+        success: true,
+        data: data.data,
+        message: data.message || 'Transfer certificate retrieved successfully',
+      };
+    } catch (error) {
+      console.error('Error verifying TC:', error);
+      return {
+        success: false,
+        message: 'An error occurred while retrieving the transfer certificate. Please try again later.',
+      };
+    }
+  }
+};
+
+// Announcements API
+export const announcementsApi = {
+  getAnnouncements: async (limit?: number): Promise<NewsItem[]> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+
+      let endpoint = `${baseUrl}/public/school/${schoolId}/announcements`;
+      if (limit) endpoint += `?limit=${limit}`;
+
+      const response = await fetch(endpoint);
+
+      if (!response.ok) {
+        console.error('Failed to fetch announcements from backend');
+        return [];
+      }
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Map backend announcement format to frontend format (NewsItem)
+        return data.data.map((ann: any) => ({
+          id: ann._id,
+          _id: ann._id,
+          title: ann.title,
+          content: ann.content,
+          date: new Date(ann.publishDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          author: 'School Administration',
+          category: ann.type === 'urgent' ? 'announcement' : 'general',
+          image: getMediaUrl(ann.imageUrl || ann.attachments?.[0]),
+          type: ann.type,
+          attachments: (ann.attachments || []).map((url: string) => getMediaUrl(url)),
+        }));
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+      return [];
+    }
+  }
+};
+
+// Public Information API for School Profile
+export const publicApi = {
+  getSchoolProfile: async (): Promise<SchoolProfile | null> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const schoolId = process.env.NEXT_PUBLIC_SCHOOL_ID || '68c22a22ec3c0fd06634bc93';
+      const response = await fetch(`${baseUrl}/public/school-profile/id/${schoolId}`);
+
+      if (!response.ok) {
+        console.error('Failed to fetch school profile from backend');
+        return null;
+      }
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        return data.data;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching school profile:', error);
+      return null;
+    }
+  }
+};

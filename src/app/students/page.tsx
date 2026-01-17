@@ -39,10 +39,10 @@ export default function StudentsPage() {
         // Fetch school profile
         const profile = await schoolProfileService.getSchoolProfileById(APP_CONFIG.school.id);
         setSchoolProfile(profile);
-        
+
         const baseUrl = APP_CONFIG.api.baseUrl;
         const schoolId = profile._id;
-        
+
         // Fetch student leaders from backend
         try {
           const studentsRes = await fetch(`${baseUrl}/public/school/${schoolId}/student-leaders?limit=20`);
@@ -84,7 +84,7 @@ export default function StudentsPage() {
         } catch (error) {
           console.error('Failed to fetch rules:', error);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -110,7 +110,7 @@ export default function StudentsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <Header />
-      
+
       {/* Hero Section with Animated Background */}
       <section className="relative py-24 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
@@ -141,54 +141,54 @@ export default function StudentsPage() {
 
       {/* Student Showcase Section */}
       {students.length > 0 && (
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Our Outstanding Students</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Meet some of our exceptional students who exemplify the values of St. Joseph Catholic School
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {students.map((student, index) => (
-              <div 
-                key={student.id} 
-                className="group relative"
-                style={{ animationDelay: `${index * 200}ms` }}
-              >
-                <Card variant="elevated" className="text-center h-full transform group-hover:scale-105 transition-all duration-500 hover:shadow-2xl border-0 bg-gradient-to-br from-white to-gray-50">
-                  <div className="relative">
-                    <div className="h-56 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 rounded-2xl mb-6 flex items-center justify-center overflow-hidden group-hover:from-blue-200 group-hover:via-purple-200 group-hover:to-pink-200 transition-all duration-500">
-                  {student.image ? (
-                        <img src={student.image} alt={student.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                      ) : (
-                        <div className="text-7xl font-bold bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-500">
-                          {student.name.charAt(0)}
-                        </div>
-                      )}
-                    </div>
-                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                      ⭐
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2 text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
-                    {student.name}
-                  </h3>
-                  <p className="text-gray-600 mb-6 font-medium">{student.grade}</p>
-                  <div className="space-y-3">
-                    {student.achievements.map((achievement, i) => (
-                      <div key={i} className="bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-3 rounded-xl border border-blue-100 group-hover:from-blue-100 group-hover:to-purple-100 transition-all duration-300">
-                        <span className="text-sm font-medium text-gray-700">{achievement}</span>
+        <section className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Our Outstanding Students</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Meet some of our exceptional students who exemplify the values of St. Joseph Catholic School
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {students.map((student, index) => (
+                <div
+                  key={student.id}
+                  className="group relative"
+                  style={{ animationDelay: `${index * 200}ms` }}
+                >
+                  <Card variant="elevated" className="text-center h-full transform group-hover:scale-105 transition-all duration-500 hover:shadow-2xl border-0 bg-gradient-to-br from-white to-gray-50">
+                    <div className="relative">
+                      <div className="h-56 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 rounded-2xl mb-6 flex items-center justify-center overflow-hidden group-hover:from-blue-200 group-hover:via-purple-200 group-hover:to-pink-200 transition-all duration-500">
+                        {student.image ? (
+                          <img src={student.image} alt={student.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        ) : (
+                          <div className="text-7xl font-bold bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-500">
+                            {student.name.charAt(0)}
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </Card>
-              </div>
-            ))}
+                      <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        ⭐
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2 text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                      {student.name}
+                    </h3>
+                    <p className="text-gray-600 mb-6 font-medium">{student.grade}</p>
+                    <div className="space-y-3">
+                      {student.achievements.map((achievement, i) => (
+                        <div key={i} className="bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-3 rounded-xl border border-blue-100 group-hover:from-blue-100 group-hover:to-purple-100 transition-all duration-300">
+                          <span className="text-sm font-medium text-gray-700">{achievement}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
       {/* Student Rules Section - Dynamic from Backend API */}
       {rules && rules.sections && rules.sections.length > 0 && (
@@ -205,7 +205,7 @@ export default function StudentsPage() {
                 Essential rules and guidelines for maintaining a positive learning environment
               </p>
             </div>
-            
+
             <div className="max-w-6xl mx-auto">
               {/* Tabs for Sections */}
               <div className="flex flex-wrap gap-2 mb-8 justify-center">
@@ -215,23 +215,22 @@ export default function StudentsPage() {
                     <button
                       key={section.id}
                       onClick={() => setActiveTab(index)}
-                      className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                        activeTab === index
+                      className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${activeTab === index
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
                           : 'bg-white text-gray-700 hover:bg-gray-100'
-                      }`}
+                        }`}
                     >
                       {section.title}
                     </button>
                   ))}
               </div>
-              
+
               {/* Content for Active Tab */}
               {rules.sections
                 .sort((a, b) => a.order - b.order)
                 .map((section, sectionIndex) => {
                   if (activeTab !== sectionIndex) return null;
-                  
+
                   // Flatten all rules from subsections
                   const allRules: Array<{ subsectionTitle?: string; rule: string }> = [];
                   section.subsections
@@ -257,7 +256,7 @@ export default function StudentsPage() {
                         </div>
                         <h3 className="text-3xl font-bold text-gray-900">{section.title}</h3>
                       </div>
-                      
+
                       {/* Group rules by subsection if they have subsection titles */}
                       {(() => {
                         const hasSubsections = allRules.some(r => r.subsectionTitle);
@@ -276,7 +275,7 @@ export default function StudentsPage() {
                             </ul>
                           );
                         }
-                        
+
                         // Group by subsection
                         const groupedRules: Record<string, string[]> = {};
                         allRules.forEach((item) => {
@@ -286,7 +285,7 @@ export default function StudentsPage() {
                           }
                           groupedRules[key].push(item.rule);
                         });
-                        
+
                         return (
                           <div className="space-y-8">
                             {Object.entries(groupedRules).map(([subsectionTitle, subsectionRules], groupIndex) => (
@@ -332,8 +331,8 @@ export default function StudentsPage() {
               Quick access to essential student information and services
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card variant="elevated" className="text-center group hover:scale-105 transition-all duration-500 hover:shadow-2xl border-0 bg-white/10 backdrop-blur-sm">
               <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -343,7 +342,39 @@ export default function StudentsPage() {
               <h3 className="text-xl font-bold mb-3 text-white">Curriculum</h3>
               <p className="text-white/80 text-sm mb-6 leading-relaxed">View detailed curriculum for all classes</p>
               <a href="/students/curriculum" className="inline-flex items-center text-green-300 hover:text-green-200 font-semibold group-hover:translate-x-1 transition-transform duration-300">
-                Learn More 
+                Learn More
+                <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </Card>
+
+            <Card variant="elevated" className="text-center group hover:scale-105 transition-all duration-500 hover:shadow-2xl border-0 bg-white/10 backdrop-blur-sm">
+              <div className="w-20 h-20 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-white">Syllabus</h3>
+              <p className="text-white/80 text-sm mb-6 leading-relaxed">Download subject-wise syllabus</p>
+              <a href="/students/syllabus" className="inline-flex items-center text-indigo-300 hover:text-indigo-200 font-semibold group-hover:translate-x-1 transition-transform duration-300">
+                View Syllabus
+                <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </Card>
+
+            <Card variant="elevated" className="text-center group hover:scale-105 transition-all duration-500 hover:shadow-2xl border-0 bg-white/10 backdrop-blur-sm">
+              <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-white">Transfer Certificate</h3>
+              <p className="text-white/80 text-sm mb-6 leading-relaxed">Retrieve your transfer certificate</p>
+              <a href="/students/transfer-certificate" className="inline-flex items-center text-cyan-300 hover:text-cyan-200 font-semibold group-hover:translate-x-1 transition-transform duration-300">
+                Get TC
                 <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -359,7 +390,7 @@ export default function StudentsPage() {
               <h3 className="text-xl font-bold mb-3 text-white">Uniform Guidelines</h3>
               <p className="text-white/80 text-sm mb-6 leading-relaxed">Complete uniform specifications</p>
               <a href="/students/uniform" className="inline-flex items-center text-purple-300 hover:text-purple-200 font-semibold group-hover:translate-x-1 transition-transform duration-300">
-                View Details 
+                View Details
                 <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -375,7 +406,7 @@ export default function StudentsPage() {
               <h3 className="text-xl font-bold mb-3 text-white">Fee Structure</h3>
               <p className="text-white/80 text-sm mb-6 leading-relaxed">View fees and payment options</p>
               <a href="/students/fees" className="inline-flex items-center text-yellow-300 hover:text-yellow-200 font-semibold group-hover:translate-x-1 transition-transform duration-300">
-                Pay Online 
+                Pay Online
                 <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -391,7 +422,7 @@ export default function StudentsPage() {
               <h3 className="text-xl font-bold mb-3 text-white">Notices & Updates</h3>
               <p className="text-white/80 text-sm mb-6 leading-relaxed">Latest announcements and notices</p>
               <a href="/students/notices" className="inline-flex items-center text-red-300 hover:text-red-200 font-semibold group-hover:translate-x-1 transition-transform duration-300">
-                Read More 
+                Read More
                 <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>

@@ -68,31 +68,29 @@ const Carousel: React.FC<CarouselProps> = ({
         {items.map((item, index) => (
           <div
             key={item.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-100' : 'opacity-0'
+              }`}
           >
             {/* Background Image */}
-            <div 
+            <div
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
               style={{
                 backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${item.image})`
               }}
             />
-            
+
             {/* Content Overlay */
             }
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-white px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
                 {schoolLogo && (
                   <div className="mb-6 flex justify-center">
-                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden bg-white/20 backdrop-blur-sm shadow-lg border-2 border-white/30">
-                      <Image 
-                        src={schoolLogo} 
-                        alt="School logo" 
-                        width={128} 
-                        height={128}
-                        className="w-full h-full object-cover" 
+                    <div className="w-24 h-24 md:w-32 md:h-32 relative">
+                      <Image
+                        src={schoolLogo}
+                        alt="School logo"
+                        fill
+                        className="object-contain drop-shadow-2xl"
                       />
                     </div>
                   </div>
@@ -146,11 +144,10 @@ const Carousel: React.FC<CarouselProps> = ({
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentIndex
-                  ? 'bg-white scale-125'
-                  : 'bg-white/50 hover:bg-white/75'
-              }`}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex
+                ? 'bg-white scale-125'
+                : 'bg-white/50 hover:bg-white/75'
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
